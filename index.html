@@ -431,7 +431,28 @@ details.rules{margin-top:16px;border-top:1px solid var(--line);padding-top:12px;
 .listpick .lname{flex:1;min-width:0}
 .listpick .lname b{font-weight:700}
 .listpick .lname span{display:block;font-size:11.5px;color:var(--muted);margin-top:1px}
-.listpick .lnum{font-family:"Bricolage Grotesque",Inter,sans-serif;font-weight:800;font-size:15px;color:var(--muted)}
+.listpick .lnum{font-family:"Bricolage Grotesque",Inter,sans-serif;font-weight:800;font-size:15px;color:var(--muted);display:block}
+.stackbar{display:flex;height:10px;border-radius:99px;overflow:hidden;margin-bottom:9px;background:rgba(255,255,255,.07)}
+.stackbar i{display:block;height:100%;transition:width .18s}
+.listpick label{position:relative;overflow:hidden;padding-left:17px;flex-wrap:wrap}
+.listpick .lname{flex:1 1 0;min-width:0}
+.listpick label i.ledge{position:absolute;left:0;top:0;bottom:0;width:5px}
+.listpick .lrt{text-align:right;flex:none}
+.listpick .lpct{display:block;font-size:11.5px;font-weight:700;margin-top:1px}
+.listpick .lpct.off{color:var(--muted);opacity:.5}
+.lslide{flex-basis:100%;display:flex;align-items:center;gap:10px;margin-top:10px;padding-top:9px;
+  border-top:1px solid rgba(255,255,255,.07)}
+.lslide .lsl{font-size:12px;font-weight:700;color:var(--muted);flex:none}
+.lslide .lsv{font-size:12px;font-weight:700;color:var(--muted);min-width:30px;text-align:right;flex:none}
+.field .listpick .lslide input[type=range]{flex:1 1 auto;width:auto;min-width:0;height:4px;min-height:0;
+  -webkit-appearance:none;appearance:none;border:0;padding:0;border-radius:99px;
+  background:rgba(255,255,255,.16);outline:none;margin:0}
+.field .listpick .lslide input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;
+  background:var(--brand);border:3px solid #1b1730;box-shadow:0 1px 4px rgba(0,0,0,.5);cursor:pointer}
+.field .listpick .lslide input[type=range]::-moz-range-thumb{width:24px;height:24px;border:3px solid #1b1730;border-radius:50%;background:var(--brand);cursor:pointer}
+.wreset{margin-top:10px;width:100%;padding:10px;border-radius:11px;border:1px solid var(--line);
+  background:transparent;color:var(--muted);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;min-height:42px}
+.wreset:hover{border-color:var(--brand);color:var(--ink)}
 details.rules summary{cursor:pointer;font-weight:600;font-size:13px;color:var(--muted)}
 details.rules ul{margin:10px 0 0;padding-left:18px;color:var(--muted);font-size:12.5px;line-height:1.6}
 @media (max-width:620px){
@@ -740,6 +761,7 @@ body.kermis #winName{color:var(--kgold);text-shadow:0 2px 10px rgba(255,206,67,.
     <div id="nameFields"></div>
     <div class="field">
       <label><span data-i18n="s_lists">Speellijsten</span> <span class="lcount" id="lCount"></span></label>
+      <div class="stackbar" id="stackBar"></div>
       <div class="listpick" id="listPick"></div>
     </div>
     <div class="field">
@@ -3142,7 +3164,12 @@ function insertSorted(tl,card){let i=tl.findIndex(c=>c.y>card.y);if(i<0)tl.push(
 function slotOK(tl,y,i){return (i===0||tl[i-1].y<=y)&&(i===tl.length||tl[i].y>=y);}
 
 // trekkans-gewicht per bronlijst: lijst 1=0,5  2=0,25  3/4=0,125  5/6/7=0,12
-const GROUP_W=[0.5,0.25,0.125,0.125,0.12,0.12,0.12,0.12];
+const GROUP_W_DEF=[50,25,13,13,12,12,12,50];          // standaardverdeling (alleen de verhouding telt)
+const LIST_COL=['#e63562','#37d3c3','#a78bfa','#a3e635','#fb923c','#38bdf8','#f472b6','#f6c445'];
+let GROUP_W=(()=>{ try{ const a=JSON.parse(localStorage.getItem('kweethet.weights.v1'));
+  return (Array.isArray(a)&&a.length===GROUP_W_DEF.length&&a.every(x=>typeof x==='number'&&x>0))?a:GROUP_W_DEF.slice();
+}catch(e){ return GROUP_W_DEF.slice(); } })();
+function saveWeights(){ try{ localStorage.setItem('kweethet.weights.v1', JSON.stringify(GROUP_W)); }catch(e){} }
 
 /* ---------- geschiedenis: welke nummers zijn al gespeeld (blijft bewaard) ---------- */
 const LS_KEY='kweethet.played.v1';
@@ -3969,6 +3996,7 @@ let LANG = (()=>{ try{ const l=localStorage.getItem('kweethet.lang.v1'); return 
 const TR={
  nl:{
   langName:'Nederlands', brand:'KweetHet',
+  chance:'Kans', resetMix:'Standaardverdeling herstellen',
   clipPlaying:'Speelt af — fragment {i} van {n}. Plaats de kaart op je tijdlijn.',
   alreadyPlaced:'Je hebt de kaart al geplaatst — draai eerst om.',
   skipNoToken:'Overslaan kost 1 token, en {name} heeft er geen.',
@@ -4039,6 +4067,7 @@ const TR={
  },
  en:{
   langName:'English', brand:'KnowIt',
+  chance:'Chance', resetMix:'Restore default mix',
   clipPlaying:'Playing — clip {i} of {n}. Place the card on your timeline.',
   alreadyPlaced:'You already placed the card — flip it over first.',
   skipNoToken:'Skipping costs 1 token, and {name} has none.',
@@ -4109,6 +4138,7 @@ const TR={
  },
  de:{
   langName:'Deutsch', brand:'WeißIch',
+  chance:'Chance', resetMix:'Standardverteilung wiederherstellen',
   clipPlaying:'Läuft — Ausschnitt {i} von {n}. Lege die Karte auf deine Zeitleiste.',
   alreadyPlaced:'Du hast die Karte schon gelegt — dreh sie erst um.',
   skipNoToken:'Überspringen kostet 1 Token, und {name} hat keins.',
@@ -4214,22 +4244,66 @@ const LIST_INFO=[
 ];
 let LIST_SEL=[true,false,false,false,true,true,true,true];   // lijst 1,5,6,7,8 standaard aan
 function listCounts(){ const c=[0,0,0,0,0,0,0,0]; ALL_CARDS.forEach(x=>c[x[4]|0]++); return c; }
+// trekkans per lijst: alleen de verhouding tussen de gewichten van de AANGEVINKTE lijsten telt
+function listShares(counts){
+  const tot=LIST_SEL.reduce((s,on,g)=>s+((on&&counts[g])?GROUP_W[g]:0),0)||1;
+  return LIST_SEL.map((on,g)=>(on&&counts[g])?100*GROUP_W[g]/tot:0);
+}
 function buildLists(){
   const counts=listCounts(), lp=$('#listPick'); if(!lp) return;
   lp.innerHTML='';
   const LI=LIST_TR[LANG]||LIST_TR.nl;
+  const share=listShares(counts);
+  // verdeelbalk boven de lijst
+  const sb=$('#stackBar');
+  if(sb){ sb.innerHTML=''; LI.forEach((info,g)=>{ if(!counts[g]||!LIST_SEL[g])return;
+    const seg=document.createElement('i'); seg.style.width=share[g]+'%'; seg.style.background=LIST_COL[g]||'var(--brand)';
+    sb.appendChild(seg); }); }
   LI.forEach((info,g)=>{
     if(!counts[g]) return;
-    const lab=el('label',LIST_SEL[g]?'on':'');
-    const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=LIST_SEL[g];
+    const on=LIST_SEL[g], col=LIST_COL[g]||'var(--brand)';
+    const lab=el('label',on?'on':'');
+    const edge=document.createElement('i'); edge.className='ledge';
+    edge.style.background=on?col:'rgba(255,255,255,.10)';           // grijs als de lijst uitstaat
+    lab.appendChild(edge);
+    const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=on;
     cb.onchange=()=>{ LIST_SEL[g]=cb.checked;
       if(!LIST_SEL.some(Boolean)){ LIST_SEL[g]=true; cb.checked=true; }   // minstens één aan
       buildLists(); };
     lab.appendChild(cb);
     lab.appendChild(el('div','lname',`<b>${t('listPfx',{n:g+1})}${info[0]}</b><span>${info[1]}</span>`));
-    lab.appendChild(el('div','lnum',numLoc(counts[g])));
+    const rt=el('div','lrt');
+    rt.appendChild(el('div','lnum',numLoc(counts[g])));
+    const pc=el('div','lpct'+(on?'':' off'), on?Math.round(share[g])+'%':'—');
+    if(on) pc.style.color=col;
+    rt.appendChild(pc);
+    lab.appendChild(rt);
+    if(on){                                                          // schuif om de kans bij te stellen
+      const sl=el('div','lslide');
+      sl.appendChild(el('span','lsl',t('chance')));
+      const rg=document.createElement('input'); rg.type='range'; rg.min=1; rg.max=100; rg.step=1; rg.value=GROUP_W[g];
+      const val=el('span','lsv',String(GROUP_W[g]));
+      rg.oninput=()=>{ GROUP_W[g]=+rg.value; val.textContent=rg.value; saveWeights();
+        const sh=listShares(counts);
+        // balk en percentages live bijwerken zonder de schuif te herbouwen (anders verlies je de greep)
+        if(sb){ let i=0; LI.forEach((x,gg)=>{ if(!counts[gg]||!LIST_SEL[gg])return;
+          const seg=sb.children[i++]; if(seg) seg.style.width=sh[gg]+'%'; }); }
+        lp.querySelectorAll('label').forEach(l=>{ const gi=+l.dataset.g; const p=l.querySelector('.lpct');
+          if(p && LIST_SEL[gi]) p.textContent=Math.round(sh[gi])+'%'; });
+      };
+      // slepen mag de lijst niet aan- of uitvinken
+      sl.onclick=e=>{ e.preventDefault(); e.stopPropagation(); };
+      sl.appendChild(rg); sl.appendChild(val);
+      lab.appendChild(sl);
+    }
+    lab.dataset.g=g;
     lp.appendChild(lab);
   });
+  // knop om de verdeling terug te zetten
+  const rb=el('button','wreset',t('resetMix'));
+  rb.type='button';
+  rb.onclick=()=>{ GROUP_W=GROUP_W_DEF.slice(); saveWeights(); buildLists(); };
+  lp.appendChild(rb);
   const gekozen=LIST_SEL.reduce((s,on,g)=>s+(on?counts[g]:0),0);
   if($('#lCount')) $('#lCount').textContent=`· ${t('nums',{n:numLoc(gekozen)})}`;
 }
