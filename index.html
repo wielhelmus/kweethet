@@ -433,6 +433,10 @@ details.rules{margin-top:16px;border-top:1px solid var(--line);padding-top:12px;
 .listpick .lname span{display:block;font-size:11.5px;color:var(--muted);margin-top:1px}
 .listpick .lnum{font-family:"Bricolage Grotesque",Inter,sans-serif;font-weight:800;font-size:15px;color:var(--muted);display:block}
 .stackbar{display:flex;height:10px;border-radius:99px;overflow:hidden;margin-bottom:9px;background:rgba(255,255,255,.07)}
+.lchips{display:flex;flex-wrap:wrap;gap:6px}
+.lchip{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--ink);
+  background:rgba(255,255,255,.06);border-radius:99px;padding:5px 10px}
+.lchip em{width:8px;height:8px;border-radius:3px;font-style:normal;flex:none}
 .stackbar i{display:block;height:100%;transition:width .18s}
 .listpick label{position:relative;overflow:hidden;padding-left:17px;flex-wrap:wrap}
 .listpick .lname{flex:1 1 0;min-width:0}
@@ -444,12 +448,12 @@ details.rules{margin-top:16px;border-top:1px solid var(--line);padding-top:12px;
   border-top:1px solid rgba(255,255,255,.07)}
 .lslide .lsl{font-size:12px;font-weight:700;color:var(--muted);flex:none}
 .lslide .lsv{font-size:12px;font-weight:700;color:var(--muted);min-width:30px;text-align:right;flex:none}
-.field .listpick .lslide input[type=range]{flex:1 1 auto;width:auto;min-width:0;height:4px;min-height:0;
+.listpick .lslide input[type=range]{flex:1 1 auto;width:auto;min-width:0;height:4px;min-height:0;
   -webkit-appearance:none;appearance:none;border:0;padding:0;border-radius:99px;
   background:rgba(255,255,255,.16);outline:none;margin:0}
-.field .listpick .lslide input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;
+.listpick .lslide input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;
   background:var(--brand);border:3px solid #1b1730;box-shadow:0 1px 4px rgba(0,0,0,.5);cursor:pointer}
-.field .listpick .lslide input[type=range]::-moz-range-thumb{width:24px;height:24px;border:3px solid #1b1730;border-radius:50%;background:var(--brand);cursor:pointer}
+.listpick .lslide input[type=range]::-moz-range-thumb{width:24px;height:24px;border:3px solid #1b1730;border-radius:50%;background:var(--brand);cursor:pointer}
 .wreset{margin-top:10px;width:100%;padding:10px;border-radius:11px;border:1px solid var(--line);
   background:transparent;color:var(--muted);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;min-height:42px}
 .wreset:hover{border-color:var(--brand);color:var(--ink)}
@@ -762,7 +766,8 @@ body.kermis #winName{color:var(--kgold);text-shadow:0 2px 10px rgba(255,206,67,.
     <div class="field">
       <label><span data-i18n="s_lists">Speellijsten</span> <span class="lcount" id="lCount"></span></label>
       <div class="stackbar" id="stackBar"></div>
-      <div class="listpick" id="listPick"></div>
+      <div class="lchips" id="listChips"></div>
+      <button class="btn" id="listsBtn" data-i18n="editLists" style="width:100%;justify-content:center;margin-top:10px">Lijsten en kansen aanpassen</button>
     </div>
     <div class="field">
       <label data-i18n="s_clip">Fragmentlengte</label>
@@ -787,6 +792,17 @@ body.kermis #winName{color:var(--kgold);text-shadow:0 2px 10px rgba(255,206,67,.
 </div>
 
 <!-- scorebord -->
+<div class="ov" id="listsOv" style="display:none">
+  <div class="modal scoremodal" style="text-align:left">
+    <div class="scorehd" style="text-align:center"><span class="scoretitle">🎵 <span data-i18n="listsTitle">Lijsten en kansen</span></span></div>
+    <div class="stackbar" id="stackBarOv" style="margin:14px 0 10px"></div>
+    <div class="listpick" id="listPick"></div>
+    <div class="winbtns" style="margin-top:16px">
+      <button class="btn play" id="listsCloseBtn" data-i18n="close" style="width:100%;justify-content:center">Sluiten</button>
+    </div>
+  </div>
+</div>
+
 <div class="ov" id="scoreOv" style="display:none">
   <div class="modal scoremodal">
     <div class="scorehd"><span class="scoretitle">📊 <span data-i18n="scoreboard">Scorebord</span></span></div>
@@ -3997,6 +4013,7 @@ const TR={
  nl:{
   langName:'Nederlands', brand:'KweetHet',
   chance:'Kans', resetMix:'Standaardverdeling herstellen',
+  editLists:'Lijsten en kansen aanpassen', listsTitle:'Lijsten en kansen',
   clipPlaying:'Speelt af — fragment {i} van {n}. Plaats de kaart op je tijdlijn.',
   alreadyPlaced:'Je hebt de kaart al geplaatst — draai eerst om.',
   skipNoToken:'Overslaan kost 1 token, en {name} heeft er geen.',
@@ -4068,6 +4085,7 @@ const TR={
  en:{
   langName:'English', brand:'KnowIt',
   chance:'Chance', resetMix:'Restore default mix',
+  editLists:'Adjust lists and chances', listsTitle:'Lists and chances',
   clipPlaying:'Playing — clip {i} of {n}. Place the card on your timeline.',
   alreadyPlaced:'You already placed the card — flip it over first.',
   skipNoToken:'Skipping costs 1 token, and {name} has none.',
@@ -4139,6 +4157,7 @@ const TR={
  de:{
   langName:'Deutsch', brand:'WeißIch',
   chance:'Chance', resetMix:'Standardverteilung wiederherstellen',
+  editLists:'Listen und Chancen anpassen', listsTitle:'Listen und Chancen',
   clipPlaying:'Läuft — Ausschnitt {i} von {n}. Lege die Karte auf deine Zeitleiste.',
   alreadyPlaced:'Du hast die Karte schon gelegt — dreh sie erst um.',
   skipNoToken:'Überspringen kostet 1 Token, und {name} hat keins.',
@@ -4254,11 +4273,16 @@ function buildLists(){
   lp.innerHTML='';
   const LI=LIST_TR[LANG]||LIST_TR.nl;
   const share=listShares(counts);
-  // verdeelbalk boven de lijst
-  const sb=$('#stackBar');
-  if(sb){ sb.innerHTML=''; LI.forEach((info,g)=>{ if(!counts[g]||!LIST_SEL[g])return;
+  // verdeelbalk: op het instelscherm én in het venster
+  const bars=[$('#stackBar'),$('#stackBarOv')].filter(Boolean);
+  bars.forEach(sb=>{ sb.innerHTML=''; LI.forEach((info,g)=>{ if(!counts[g]||!LIST_SEL[g])return;
     const seg=document.createElement('i'); seg.style.width=share[g]+'%'; seg.style.background=LIST_COL[g]||'var(--brand)';
-    sb.appendChild(seg); }); }
+    sb.appendChild(seg); }); });
+  // labeltjes op het instelscherm: welke lijsten doen mee en met welk aandeel
+  const ch=$('#listChips');
+  if(ch){ ch.innerHTML=''; LI.forEach((info,g)=>{ if(!counts[g]||!LIST_SEL[g])return;
+    const c=el('span','lchip',`<em style="background:${LIST_COL[g]||'var(--brand)'}"></em>${info[0]} · ${Math.round(share[g])}%`);
+    ch.appendChild(c); }); }
   LI.forEach((info,g)=>{
     if(!counts[g]) return;
     const on=LIST_SEL[g], col=LIST_COL[g]||'var(--brand)';
@@ -4286,8 +4310,10 @@ function buildLists(){
       rg.oninput=()=>{ GROUP_W[g]=+rg.value; val.textContent=rg.value; saveWeights();
         const sh=listShares(counts);
         // balk en percentages live bijwerken zonder de schuif te herbouwen (anders verlies je de greep)
-        if(sb){ let i=0; LI.forEach((x,gg)=>{ if(!counts[gg]||!LIST_SEL[gg])return;
-          const seg=sb.children[i++]; if(seg) seg.style.width=sh[gg]+'%'; }); }
+        bars.forEach(sb=>{ let i=0; LI.forEach((x,gg)=>{ if(!counts[gg]||!LIST_SEL[gg])return;
+          const seg=sb.children[i++]; if(seg) seg.style.width=sh[gg]+'%'; }); });
+        if(ch){ let j=0; LI.forEach((x,gg)=>{ if(!counts[gg]||!LIST_SEL[gg])return;
+          const c=ch.children[j++]; if(c) c.innerHTML=`<em style="background:${LIST_COL[gg]||'var(--brand)'}"></em>${x[0]} · ${Math.round(sh[gg])}%`; }); }
         lp.querySelectorAll('label').forEach(l=>{ const gi=+l.dataset.g; const p=l.querySelector('.lpct');
           if(p && LIST_SEL[gi]) p.textContent=Math.round(sh[gi])+'%'; });
       };
@@ -4599,6 +4625,11 @@ $('#resetHistBtn').onclick=()=>{ resetPlayed(); refreshHist(); };
 $('#scoreBtn').onclick=showScoreboard;
 $('#scoreCloseBtn').onclick=hideScoreboard;
 $('#scoreOv').onclick=(e)=>{ if(e.target.id==='scoreOv') hideScoreboard(); };
+function showLists(){ buildLists(); const ov=$('#listsOv'); if(ov) ov.style.display='grid'; }
+function hideLists(){ const ov=$('#listsOv'); if(ov) ov.style.display='none'; }
+$('#listsBtn').onclick=showLists;
+$('#listsCloseBtn').onclick=hideLists;
+$('#listsOv').onclick=(e)=>{ if(e.target.id==='listsOv') hideLists(); };
 $('#scoreClearBtn').onclick=function(){
   const btn=this;
   if(btn.dataset.confirm!=='1'){
