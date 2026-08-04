@@ -68,7 +68,10 @@ input{-webkit-user-select:text;user-select:text}
 #volSlider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;
   background:var(--brand);border:2px solid #fff2;box-shadow:0 1px 3px rgba(0,0,0,.4);cursor:pointer}
 #volSlider::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--brand);border:2px solid #fff2;cursor:pointer}
-@media (max-width:620px){#volSlider{width:120px}}
+@media (max-width:620px){#volSlider{width:120px;max-width:100%}
+  .volwrap{max-width:100%;flex-wrap:nowrap;min-width:0}
+  .volwrap.npvol{flex:1 1 auto}}
+@media (max-width:360px){#volSlider{width:84px}}
 #qrBtn{padding:8px 12px;font-size:13px;font-weight:700;gap:7px;align-items:center}
 #qrBtn .qrlbl{white-space:nowrap}
 #qrBtn.off{border-color:var(--brand);background:var(--pc12,rgba(255,84,112,.12));color:var(--brand)}
@@ -457,14 +460,15 @@ details.rules{margin-top:16px;border-top:1px solid var(--line);padding-top:12px;
 .wreset{margin-top:10px;width:100%;padding:10px;border-radius:11px;border:1px solid var(--line);
   background:transparent;color:var(--muted);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;min-height:42px}
 .wreset:hover{border-color:var(--brand);color:var(--ink)}
-details.rules summary{cursor:pointer;font-weight:600;font-size:13px;color:var(--muted)}
+details.rules summary{cursor:pointer;font-weight:600;font-size:13px;color:var(--muted);
+  min-height:44px;display:flex;align-items:center;gap:6px;padding:4px 0;-webkit-tap-highlight-color:transparent}
 details.rules ul{margin:10px 0 0;padding-left:18px;color:var(--muted);font-size:12.5px;line-height:1.6}
 @media (max-width:620px){
   .wrap{padding:10px 12px 30px}
-  /* header compact op één rij */
-  .top{gap:6px;padding:2px 0 10px;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-  .top::-webkit-scrollbar{display:none}
+  /* header: slaat om naar een tweede rij i.p.v. buiten beeld te schuiven */
+  .top{gap:6px;row-gap:8px;padding:2px 0 10px;flex-wrap:wrap;overflow:visible}
   .top>*{flex:none}
+  .top #restartBtn{margin-left:auto}
   .top .spacer{display:none}
   .brand{font-size:16px;margin-right:2px}
   .brand .vinyl{width:22px;height:22px}
