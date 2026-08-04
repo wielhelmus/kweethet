@@ -3137,7 +3137,7 @@ let soundOn=true, actx=null;
 function applyMute(){ if(audioEl) audioEl.muted=!soundOn; }
 function toggleSound(){ soundOn=!soundOn; applyMute(); if(soundOn)actxGet(); render(); }
 
-function mkCard(raw){return {y:raw[0],ar:raw[1],ti:raw[2],id:raw[3],g:raw[4]|0};}
+function mkCard(raw,ix){return {y:raw[0],ar:raw[1],ti:raw[2],id:raw[3],g:raw[4]|0,ix:(ix==null?-1:ix)};}
 function insertSorted(tl,card){let i=tl.findIndex(c=>c.y>card.y);if(i<0)tl.push(card);else tl.splice(i,0,card);}
 function slotOK(tl,y,i){return (i===0||tl[i-1].y<=y)&&(i===tl.length||tl[i].y>=y);}
 
@@ -3162,15 +3162,67 @@ function _nlWords(t){ return (String(t||'').toLowerCase().match(/[a-zà-ÿ']+/g)
 function titleDutch(ti){ let st=0,wk=0; for(const x of _nlWords(ti)){ if(NL_STRONG.has(x))st++; else if(NL_WEAK.has(x))wk++; } const ij=NL_IJ.test(String(ti||'').toLowerCase())?1:0; return st>=1 || (st+wk+ij)>=2; }
 function isDutchCard(c){ if(!c) return false; if(titleDutch(c.ti)) return true; const ar=String(c.ar||'').toLowerCase(); const first=ar.split(',')[0].trim(); return NL_ARTISTS.has(ar)||NL_ARTISTS.has(first); }
 
+
+/* ---------- potje automatisch bewaren, zodat verversen niets kost ---------- */
+const SAVE_KEY='kweethet.game.v1';
+const _ix  = c => (c && c.ix>=0) ? c.ix : -1;                 // kaart -> plek in ALL_CARDS
+const _ixs = a => (a||[]).map(_ix).filter(i=>i>=0);
+const _card= i => (i>=0 && ALL_CARDS[i]) ? mkCard(ALL_CARDS[i], i) : null;
+const _cards=a => (a||[]).map(_card).filter(Boolean);
+
+function saveGame(){
+  try{
+    if(!G || !G.players || G.phase==='win'){ return; }
+    const d={
+      v:1, lang:LANG, win:WIN, lists:G.lists||[],
+      piles:(G.piles||[]).map(_ixs), discard:_ixs(G.discard),
+      players:(G.players||[]).map(p=>({n:p.name, t:p.tokens, tl:_ixs(p.tl)})),
+      cur:G.cur, phase:G.phase, card:_ix(G.card), played:!!G.played,
+      chosen:G.chosen, challenges:G.challenges||[], challenger:G.challenger,
+      bonus:!!G.bonus, bonusGranted:!!G.bonusGranted, msg:G.msg||'',
+      histOff:!!G.histOff, histSaved:!!G.histSaved,
+      lastCard:_ix(G.lastCard), lastWasTrade:!!G.lastWasTrade,
+      used:[...(G.usedArtists||[])]
+    };
+    localStorage.setItem(SAVE_KEY, JSON.stringify(d));
+  }catch(e){}
+}
+function clearSave(){ try{ localStorage.removeItem(SAVE_KEY); }catch(e){} }
+function loadGame(){
+  try{
+    const raw=localStorage.getItem(SAVE_KEY); if(!raw) return false;
+    const d=JSON.parse(raw);
+    if(!d || d.v!==1 || !d.players || !d.players.length || d.phase==='win') return false;
+    if(d.lang && d.lang!==LANG) return false;            // andere taal = andere stapel
+    G={
+      piles:(d.piles||[]).map(_cards), discard:_cards(d.discard),
+      players:d.players.map(p=>({name:p.n, tokens:p.t, tl:_cards(p.tl)})),
+      cur:d.cur|0, phase:d.phase||'draw', card:_card(d.card), played:!!d.played,
+      chosen:(d.chosen==null?null:d.chosen), challenge:null,
+      challenges:d.challenges||[], challenger:d.challenger,
+      bonus:!!d.bonus, bonusGranted:!!d.bonusGranted, msg:d.msg||'',
+      histOff:!!d.histOff, histSaved:!!d.histSaved,
+      lastCard:_card(d.lastCard), lastWasTrade:!!d.lastWasTrade,
+      log:[], lists:d.lists||[0], usedArtists:new Set(d.used||[])
+    };
+    if(!G.card && G.phase!=='draw'){ G.phase='draw'; }
+    G_LISTS=G.lists;
+    if(d.win) WIN=d.win;
+    NPLAYERS=G.players.length;
+    return true;
+  }catch(e){ return false; }
+}
+
 function newGame(names, lists){
   const sel=(lists&&lists.length)?lists.slice().sort((a,b)=>a-b):[0];
   G_LISTS=sel;
   const wantG=new Set(sel);
   let all=[];
   const seenSong=new Set();                              // zelfde nummer kan in meerdere lijsten staan
-  for(const raw of ALL_CARDS){
+  for(let ix=0; ix<ALL_CARDS.length; ix++){
+    const raw=ALL_CARDS[ix];
     if(!wantG.has(raw[4]|0)) continue;
-    const c=mkCard(raw);
+    const c=mkCard(raw,ix);
     if(LANG!=='nl' && isDutchCard(c)) continue;          // geen Nederlandstalige nummers bij EN/DE
     const sk=songKey(c);
     if(seenSong.has(sk)) continue;                       // duplicaat: laagste gekozen lijst wint
@@ -3647,7 +3699,7 @@ function showScoreboard(){
 function hideScoreboard(){ const ov=$('#scoreOv'); if(ov) ov.style.display='none'; }
 function refreshScoreBtn(){ const b=$('#scoreBtn'); if(b) b.style.display='inline-flex'; }
 function win(k){
-  G.phase='win'; G.winner=k; render();
+  G.phase='win'; G.winner=k; clearSave(); render();
   const wa=$('#winAvatar'); if(wa) wa.innerHTML=avatarSVG(k,'tongue');
   { const tl=$('#trophyL'),tr=$('#trophyR'); if(tl)tl.innerHTML=ICON.trophy; if(tr)tr.innerHTML=ICON.trophy; }
   const w=G.players[k];
@@ -3678,6 +3730,7 @@ function win(k){
 
 /* ---------- render ---------- */
 function render(){
+  saveGame();
   $('#deckN').textContent=G.piles.reduce((s,p)=>s+p.length,0);
   { const di=document.querySelector('#deckChip .ci'); if(di&&!di.innerHTML)di.innerHTML=ICON.deck;
     const pi=document.querySelector('#playedChip .ci'); if(pi&&!pi.innerHTML)pi.innerHTML=ICON.played; }
@@ -4482,17 +4535,37 @@ $('#scoreClearBtn').onclick=function(){
   try{ localStorage.removeItem('kweethet.hist.v1'); }catch(e){}
   showScoreboard(); refreshScoreBtn();
 };
+/* waarschuwing bij verversen/sluiten tijdens een lopend potje */
+function gameBusy(){
+  try{
+    if(typeof G==='undefined' || !G || !G.players) return false;
+    if(G.phase==='win') return false;                      // potje is klaar
+    const su=document.querySelector('#setup');
+    if(su && su.style.display!=='none') return false;      // nog in het instelscherm
+    return true;
+  }catch(e){ return false; }
+}
+window.addEventListener('beforeunload', function(e){
+  if(!gameBusy()) return;                                  // niets te verliezen
+  e.preventDefault();
+  e.returnValue = '';                                      // browser toont zijn eigen tekst
+  return '';
+});
+
 $('#startBtn').onclick=()=>{saveNames();const nm=readNames();rememberNames(nm);newGame(nm,selectedLists());tagStarts();$('#setup').style.display='none';render();};
 $('#againBtn').onclick=()=>{stopConfetti();stopAudio();$('#winOv').style.display='none';newGame(G.players.map(p=>p.name),G.lists||selectedLists());tagStarts();render();};
-$('#newNamesBtn').onclick=()=>{stopConfetti();stopAudio();$('#winOv').style.display='none';refreshHist();buildSetup();$('#setup').style.display='block';};
+$('#newNamesBtn').onclick=()=>{stopConfetti();stopAudio();clearSave();$('#winOv').style.display='none';refreshHist();buildSetup();$('#setup').style.display='block';};
 $('#restartBtn').onclick=()=>{
   const bezig = G && G.players && G.phase!=='win' && G.players.some(p=>p.tl.length>1);
   if(bezig && !confirm('Nieuw spel starten? Het huidige potje gaat verloren.')) return;
-  stopConfetti();stopAudio();refreshHist();buildSetup();$('#setup').style.display='block';
+  stopConfetti();stopAudio();clearSave();refreshHist();buildSetup();$('#setup').style.display='block';
 };
 applyI18n();
 buildSetup();
 refreshHist();
+// een onderbroken potje (bv. na verversen) gewoon hervatten
+try{ if(loadGame()){ $('#setup').style.display='none'; render(); } }catch(e){}
+
 initKermisHooks();
 if(KERMIS){ document.body.classList.add('kermis'); buildKermisDecor(); }
 /* PWA: service worker registreren (alleen als de app via een server draait) */
