@@ -604,14 +604,6 @@ body.kermis .kermis-ribbon{display:inline-block;margin-left:10px;padding:4px 12p
   -webkit-mask:radial-gradient(circle at 12px 15px, transparent 11px, #000 12px) repeat-x 0 0/24px 15px;
           mask:radial-gradient(circle at 12px 15px, transparent 11px, #000 12px) repeat-x 0 0/24px 15px;
   filter:drop-shadow(0 2px 1px rgba(0,0,0,.25))}
-.kermis-bunting{display:flex;justify-content:center;overflow:hidden;height:24px;line-height:0;white-space:nowrap;margin-top:3px}
-.kermis-bunting i{flex:none;width:0;height:0;margin:0 1px;border-left:12px solid transparent;border-right:12px solid transparent;
-  border-top:19px solid var(--kred);filter:drop-shadow(0 3px 2px rgba(0,0,0,.35));transform-origin:top center;animation:ksway 3.2s ease-in-out infinite}
-.kermis-bunting i:nth-child(4n+1){border-top-color:var(--kred)}
-.kermis-bunting i:nth-child(4n+2){border-top-color:var(--kgold)}
-.kermis-bunting i:nth-child(4n+3){border-top-color:var(--kteal)}
-.kermis-bunting i:nth-child(4n+4){border-top-color:var(--kpink)}
-@keyframes ksway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
 .kermis-bulbs{display:flex;justify-content:center;overflow:hidden;height:16px;margin-top:2px;white-space:nowrap}
 .kermis-bulbs b{flex:none;width:9px;height:9px;margin:0 5px;border-radius:50%;
   background:radial-gradient(circle at 35% 30%,#fffbe8,var(--kbulb) 55%,var(--kgold2));
@@ -628,7 +620,10 @@ body.kermis .btn.ghost{border-color:rgba(255,206,67,.4);color:var(--kcream)}
 body.kermis .btn.gold,body.kermis .btn.trade{background:linear-gradient(180deg,#ffe07a,var(--kgold) 60%,var(--kgold2));color:#4a2200;border-color:rgba(255,255,255,.5);font-weight:800}
 
 body.kermis .chip{background:var(--kcream);color:var(--kbrown);border:1px dashed var(--kgold2);border-radius:8px;font-weight:800}
-body.kermis .chip b{color:var(--kred)} body.kermis .chip .ci{background:var(--kred)}
+/* het cijfer was rood (3,16:1 contrast op de romige achtergrond, te laag); kbrown zoals de rest
+   van de chip geeft 10,75:1. De rode stip (.ci) is decoratief en blijft rood. */
+body.kermis .chip b{color:var(--kbrown)}
+body.kermis .chip .ci{background:var(--kred)}
 body.kermis .turnchip{color:#fff!important;border:0;box-shadow:0 4px 14px -4px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.4)}
 
 body.kermis .stage{position:relative;border:2px solid rgba(255,206,67,.5);border-radius:20px;
@@ -655,7 +650,10 @@ body.kermis .disc.mystery::after{content:"";position:absolute;inset:-14px;border
 
 body.kermis .card{border:1px solid rgba(255,206,67,.45);background:linear-gradient(180deg,#4f1e86,#3a1266);
   box-shadow:0 8px 22px -14px rgba(0,0,0,.7),inset 0 0 0 1px rgba(255,255,255,.05)}
-body.kermis .card .yr,body.kermis .gllist .yr{color:var(--kgold)}
+/* .yr tekent normaal een kleurverloop via -webkit-text-fill-color; die moet hier expliciet
+   mee overschreven worden, anders blijft de gewone verloopkleur zichtbaar (o.a. op Safari) */
+body.kermis .card .yr,body.kermis .gllist .yr{background:none;-webkit-text-fill-color:var(--kgold);color:var(--kgold);
+  filter:drop-shadow(0 1px 6px rgba(255,206,67,.35))}
 
 body.kermis .modal{border:2px solid rgba(255,206,67,.5);background:linear-gradient(180deg,#43166f,#340f5c);
   box-shadow:0 30px 80px -30px rgba(0,0,0,.8),0 0 0 6px rgba(255,59,82,.15),inset 0 0 60px rgba(255,206,67,.06)}
@@ -678,7 +676,7 @@ body.kermis #winName{color:var(--kgold);text-shadow:0 2px 10px rgba(255,206,67,.
 @keyframes kfloat{0%,100%{transform:translateY(0) rotate(0);opacity:.35}50%{transform:translateY(-14px) rotate(20deg);opacity:.85}}
 
 @media (prefers-reduced-motion:reduce){
-  body.kermis::after,.kermis-bunting i,.kermis-bulbs b,.kermis-wheel svg,body.kermis .btn.play::after,
+  body.kermis::after,.kermis-bulbs b,.kermis-wheel svg,body.kermis .btn.play::after,
   body.kermis .disc.mystery::before,body.kermis .disc.mystery::after,body.kermis .stage::before,.kermis-spark{animation:none!important}
 }
 </style>
@@ -3186,6 +3184,8 @@ function qrFor(card){
 let WIN = (()=>{ try{ const v=parseInt(localStorage.getItem('kweethet.win.v1')); return [7,10,15].includes(v)?v:10; }catch(e){ return 10; } })();
 const TOKMAX=5;
 const PCOL={1:'#e63562',2:'#37d3c3',3:'#a78bfa',4:'#a3e635',5:'#fb923c',6:'#38bdf8'};
+// speler 1 is ook de merkkleur (--brand/--p1); in het kermis-thema is dat roze in plaats van het gewone rood
+function syncKermisPCOL(){ PCOL[1]=(typeof KERMIS!=='undefined'&&KERMIS)?'#ff2d6e':'#e63562'; }
 // kies zwarte of witte tekst afhankelijk van hoe licht de kleur is (leesbaarheid)
 function inkOn(hex){
   const h=hex.replace('#',''); const n=parseInt(h,16);
@@ -4076,7 +4076,7 @@ function tagStarts(){G.players.forEach(p=>{if(p.tl[0])p.tl[0].__start=true;});}
 let NPLAYERS=2;
 const NAMES=['Speler 1','Speler 2','Speler 3','Speler 4','Speler 5','Speler 6'];
 /* ===== meertaligheid (NL/EN/DE) ===== */
-const APP_VERSION='KweetHet.05-08-26e';   // versienummer: KweetHet.<dd-mm-jj>
+const APP_VERSION='KweetHet.05-08-26f';   // versienummer: KweetHet.<dd-mm-jj>
 let LANG = (()=>{ try{ const l=localStorage.getItem('kweethet.lang.v1'); return (l==='en'||l==='de'||l==='nl')?l:'nl'; }catch(e){ return 'nl'; } })();
 const TR={
  nl:{
@@ -4456,14 +4456,12 @@ function kWrong(){ kArp(['D#4','D4','C#4','C4'],0.16,0.4); }
 function kStart(){ var o=kArp(['G4','C5','E5','G5','E5','G5','C6'],0.07,0.4);
   if(o&&kHaveSynth()&&NOTE['G2'])organVoice(o.ctx,o.bus,NOTE['G2'],o.ctx.currentTime+0.02,0.6,0.5,true);
   setTimeout(kSpark,60); }
-function kMakeDeco(nBunt,nBulb){
+function kMakeDeco(nBulb){
   var d=document.createElement('div'); d.className='kermis-deco';
   var sc=document.createElement('div'); sc.className='kermis-scallop'; d.appendChild(sc);
-  var bu=document.createElement('div'); bu.className='kermis-bunting';
-  for(var i=0;i<nBunt;i++){var f=document.createElement('i');f.style.animationDelay=(i%6*0.12)+'s';bu.appendChild(f);}
   var bl=document.createElement('div'); bl.className='kermis-bulbs';
   for(var j=0;j<nBulb;j++){var b=document.createElement('b');b.style.animationDelay=(j*0.09)+'s';bl.appendChild(b);}
-  d.appendChild(bu); d.appendChild(bl); return d;
+  d.appendChild(bl); return d;
 }
 function kFerris(cls){
   var w=document.createElement('div'); w.className='kermis-wheel '+cls; var cab='';
@@ -4477,12 +4475,12 @@ function kFerris(cls){
 function removeKermisDecor(){ document.querySelectorAll('.kermis-deco,.kermis-wheel,.kermis-spark,.kermis-ribbon').forEach(function(e){e.remove();}); }
 function buildKermisDecor(){
   removeKermisDecor();
-  var wrap=document.querySelector('.wrap'); if(wrap) wrap.insertBefore(kMakeDeco(150,210), wrap.firstChild);
+  var wrap=document.querySelector('.wrap'); if(wrap) wrap.insertBefore(kMakeDeco(210), wrap.firstChild);
   document.querySelectorAll('.brand').forEach(function(br){
     var r=document.createElement('span'); r.className='kermis-ribbon'; r.textContent='Kermis-editie'; br.appendChild(r);
   });
   var modal=document.querySelector('#setup .modal');
-  if(modal){ var sb=modal.querySelector('.brand'); var dd=kMakeDeco(48,72); if(sb) sb.after(dd); else modal.insertBefore(dd,modal.firstChild); }
+  if(modal){ var sb=modal.querySelector('.brand'); var dd=kMakeDeco(72); if(sb) sb.after(dd); else modal.insertBefore(dd,modal.firstChild); }
   document.body.appendChild(kFerris('w1')); document.body.appendChild(kFerris('w2'));
   [['6%','16%',22],['92%','20%',16],['10%','76%',18],['88%','70%',20],['50%','8%',14]].forEach(function(sp,i){
     var el2=document.createElement('div'); el2.className='kermis-spark';
@@ -4493,6 +4491,7 @@ function buildKermisDecor(){
 }
 function applyKermis(on){
   KERMIS=!!on; try{localStorage.setItem('kweethet.kermis.v1',KERMIS?'1':'0');}catch(e){}
+  syncKermisPCOL();
   if(KERMIS){ document.body.classList.add('kermis'); buildKermisDecor(); }
   else { document.body.classList.remove('kermis'); removeKermisDecor(); }
 }
@@ -4748,6 +4747,7 @@ refreshHist();
 try{ if(loadGame()){ $('#setup').style.display='none'; render(); } }catch(e){}
 
 initKermisHooks();
+syncKermisPCOL();
 if(KERMIS){ document.body.classList.add('kermis'); buildKermisDecor(); }
 /* PWA: service worker registreren (alleen als de app via een server draait) */
 if('serviceWorker' in navigator && location.protocol!=='file:'){
