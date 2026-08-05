@@ -586,8 +586,8 @@ body.kermis::after{
 
 .kermis-wheel{position:fixed;z-index:-1;pointer-events:none;opacity:.16;filter:drop-shadow(0 0 12px rgba(255,206,67,.5))}
 .kermis-wheel svg{display:block;animation:kspin 46s linear infinite}
-.kermis-wheel.w1{left:-70px;bottom:-70px;width:300px}
-.kermis-wheel.w2{right:-90px;top:60px;width:230px;opacity:.11}
+.kermis-wheel.w1{left:-55px;bottom:-55px;width:210px}
+.kermis-wheel.w2{right:-60px;top:90px;width:70px;opacity:.11}
 
 body.kermis .brand{
   font-family:"Bricolage Grotesque",Inter,sans-serif;text-transform:uppercase;letter-spacing:.045em;color:var(--kgold);
@@ -4078,7 +4078,7 @@ function tagStarts(){G.players.forEach(p=>{if(p.tl[0])p.tl[0].__start=true;});}
 let NPLAYERS=2;
 const NAMES=['Speler 1','Speler 2','Speler 3','Speler 4','Speler 5','Speler 6'];
 /* ===== meertaligheid (NL/EN/DE) ===== */
-const APP_VERSION='KweetHet.05-08-26g';   // versienummer: KweetHet.<dd-mm-jj>
+const APP_VERSION='KweetHet.05-08-26h';   // versienummer: KweetHet.<dd-mm-jj>
 let LANG = (()=>{ try{ const l=localStorage.getItem('kweethet.lang.v1'); return (l==='en'||l==='de'||l==='nl')?l:'nl'; }catch(e){ return 'nl'; } })();
 const TR={
  nl:{
