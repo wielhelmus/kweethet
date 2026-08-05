@@ -214,6 +214,8 @@ h1,h2,h3,.num{font-family:"Bricolage Grotesque",Inter,sans-serif}
 .player.collapsed .pname{font-size:15px}
 .collapse-hint{font-size:10.5px;color:var(--muted);opacity:.6;white-space:nowrap;margin-left:4px}
 @media (max-width:620px){.collapse-hint{display:none}}
+/* op mobiel is de hint-tekst verborgen; een chevron achter de naam laat zien dat de rij aantikbaar is */
+@media (max-width:620px){.player.collapsed .pname::after{content:"";width:8px;height:8px;border-right:2.5px solid var(--muted);border-bottom:2.5px solid var(--muted);transform:rotate(45deg);margin-top:-2px;flex:none}}
 .player.active{border-color:var(--pc);box-shadow:0 0 0 1px var(--pc),0 14px 40px -22px var(--pc)}
 .phead{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
 .pname{font-weight:800;font-size:17px;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
@@ -3901,7 +3903,10 @@ function render(){
 
   // players
   const box=$('#players');box.innerHTML='';box.className='players'+(G.players.length>2?' many':'');
-  const canCollapse = G.players.length>=2 && G.phase!=='win';
+  // 3+ spelers: altijd inklapbaar. Precies 2 spelers: alleen op smalle (mobiele) schermen,
+  // want op een breed scherm is er ruimte zat. Wordt bij elke render opnieuw beoordeeld.
+  const narrow = window.matchMedia('(max-width:620px)').matches;
+  const canCollapse = G.phase!=='win' && (G.players.length>=3 || (G.players.length===2 && narrow));
   if(!G.expanded) G.expanded={};
   G.players.forEach((pl,k)=>{
     pl.tokens=Math.max(0,Math.min(TOKMAX,pl.tokens|0));
@@ -4061,7 +4066,7 @@ function tagStarts(){G.players.forEach(p=>{if(p.tl[0])p.tl[0].__start=true;});}
 let NPLAYERS=2;
 const NAMES=['Speler 1','Speler 2','Speler 3','Speler 4','Speler 5','Speler 6'];
 /* ===== meertaligheid (NL/EN/DE) ===== */
-const APP_VERSION='KweetHet.05-08-26b';   // versienummer: KweetHet.<dd-mm-jj>
+const APP_VERSION='KweetHet.05-08-26c';   // versienummer: KweetHet.<dd-mm-jj>
 let LANG = (()=>{ try{ const l=localStorage.getItem('kweethet.lang.v1'); return (l==='en'||l==='de'||l==='nl')?l:'nl'; }catch(e){ return 'nl'; } })();
 const TR={
  nl:{
