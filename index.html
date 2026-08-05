@@ -619,12 +619,14 @@ body.kermis .btn.play::after{content:"";position:absolute;top:0;left:-45%;width:
 body.kermis .btn.ghost{border-color:rgba(255,206,67,.4);color:var(--kcream)}
 body.kermis .btn.gold,body.kermis .btn.trade{background:linear-gradient(180deg,#ffe07a,var(--kgold) 60%,var(--kgold2));color:#4a2200;border-color:rgba(255,255,255,.5);font-weight:800}
 
-body.kermis .chip{background:var(--kcream);color:var(--kbrown);border:1px dashed var(--kgold2);border-radius:8px;font-weight:800}
+/* :not(.turnchip) — het beurt-veld deelt de klasse .chip, maar moet zijn eigen kleur-per-speler
+   met automatisch zwart/wit contrast (--tcol/--tink) houden, niet deze romige kaartjes-look. */
+body.kermis .chip:not(.turnchip){background:var(--kcream);color:var(--kbrown);border:1px dashed var(--kgold2);border-radius:8px;font-weight:800}
 /* het cijfer was rood (3,16:1 contrast op de romige achtergrond, te laag); kbrown zoals de rest
    van de chip geeft 10,75:1. De rode stip (.ci) is decoratief en blijft rood. */
-body.kermis .chip b{color:var(--kbrown)}
+body.kermis .chip:not(.turnchip) b{color:var(--kbrown)}
 body.kermis .chip .ci{background:var(--kred)}
-body.kermis .turnchip{color:#fff!important;border:0;box-shadow:0 4px 14px -4px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.4)}
+body.kermis .turnchip{border:0;box-shadow:0 4px 14px -4px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.4)}
 
 body.kermis .stage{position:relative;border:2px solid rgba(255,206,67,.5);border-radius:20px;
   box-shadow:0 0 0 4px rgba(255,59,82,.15),0 18px 50px -26px #000,inset 0 0 40px rgba(255,206,67,.05)}
@@ -4076,7 +4078,7 @@ function tagStarts(){G.players.forEach(p=>{if(p.tl[0])p.tl[0].__start=true;});}
 let NPLAYERS=2;
 const NAMES=['Speler 1','Speler 2','Speler 3','Speler 4','Speler 5','Speler 6'];
 /* ===== meertaligheid (NL/EN/DE) ===== */
-const APP_VERSION='KweetHet.05-08-26f';   // versienummer: KweetHet.<dd-mm-jj>
+const APP_VERSION='KweetHet.05-08-26g';   // versienummer: KweetHet.<dd-mm-jj>
 let LANG = (()=>{ try{ const l=localStorage.getItem('kweethet.lang.v1'); return (l==='en'||l==='de'||l==='nl')?l:'nl'; }catch(e){ return 'nl'; } })();
 const TR={
  nl:{
