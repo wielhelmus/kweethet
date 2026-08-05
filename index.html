@@ -229,6 +229,17 @@ h1,h2,h3,.num{font-family:"Bricolage Grotesque",Inter,sans-serif}
 /* op mobiel is de hint-tekst verborgen; een chevron achter de naam laat zien dat de rij aantikbaar is */
 @media (max-width:620px){.player.collapsed .pname::after{content:"";width:8px;height:8px;border-right:2.5px solid var(--muted);border-bottom:2.5px solid var(--muted);transform:rotate(45deg);margin-top:-2px;flex:none}}
 .player.active{border-color:var(--pc);box-shadow:0 0 0 1px var(--pc),0 14px 40px -22px var(--pc)}
+/* de rand van wie aan de beurt is licht van links naar rechts op. Het maskertrucje laat alleen
+   de rand over (content-box eruit knippen), zodat de kaarten zelf niets van de veeg merken.
+   prefers-reduced-motion wordt afgevangen door de algemene regel verderop. */
+.player.active::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:2px;pointer-events:none;
+  background:linear-gradient(90deg,transparent 38%,var(--pc,var(--brand)) 50%,transparent 62%);background-size:260% 100%;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+          mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;
+  animation:pveeg 3.2s linear infinite}
+@keyframes pveeg{from{background-position:100% 0}to{background-position:0% 0}}
+/* na de winst staat de rand stil */
+.player.klaar::after{display:none}
 .phead{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
 .pname{font-weight:800;font-size:17px;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
 .pname .avatar{flex:none;width:52px;height:52px;border-radius:50%;background:var(--pc12,rgba(255,255,255,.06));padding:3px}
@@ -3949,7 +3960,7 @@ function render(){
     const active=k===G.cur;
     // ingeklapt als: 3+ spelers, niet aan de beurt, en niet handmatig opengeklapt
     const collapsed = canCollapse && !active && !G.expanded[k];
-    const pv=el('div','player'+(active?' active':'')+(collapsed?' collapsed':''));
+    const pv=el('div','player'+(active?' active':'')+(collapsed?' collapsed':'')+(G.phase==='win'?' klaar':''));
     const col=PCOL[k+1];
     pv.style.setProperty('--pc',col);
     pv.style.setProperty('--pcink',inkOn(col));
@@ -4113,7 +4124,7 @@ function tagStarts(){G.players.forEach(p=>{if(p.tl[0])p.tl[0].__start=true;});}
 let NPLAYERS=2;
 const NAMES=['Speler 1','Speler 2','Speler 3','Speler 4','Speler 5','Speler 6'];
 /* ===== meertaligheid (NL/EN/DE) ===== */
-const APP_VERSION='KweetHet.05-08-26l';   // versienummer: KweetHet.<dd-mm-jj>
+const APP_VERSION='KweetHet.05-08-26m';   // versienummer: KweetHet.<dd-mm-jj>
 let LANG = (()=>{ try{ const l=localStorage.getItem('kweethet.lang.v1'); return (l==='en'||l==='de'||l==='nl')?l:'nl'; }catch(e){ return 'nl'; } })();
 const TR={
  nl:{
