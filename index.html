@@ -89,12 +89,10 @@ input{-webkit-user-select:text;user-select:text}
   .volwrap{max-width:100%;flex-wrap:nowrap;min-width:0}
   .volwrap.npvol{flex:1 1 auto;height:54px}}
 @media (max-width:360px){#volSlider{width:84px}}
-#qrBtn{padding:8px 12px;font-size:13px;font-weight:700;gap:7px;align-items:center}
+#qrBtn{font-weight:700;align-items:center}
 #qrBtn .qrlbl{white-space:nowrap}
 #qrBtn.off{border-color:var(--brand);background:var(--pc12,rgba(255,84,112,.12));color:var(--brand)}
 @media (max-width:620px){#qrBtn .qrlbl{display:none}#qrBtn{padding:8px 10px}}
-/* stond als inline-stijl in de knop zelf; hier zodat een thema het kan overschrijven */
-#restartBtn{padding:8px 12px;font-size:12.5px}
 .btn.play.loading{opacity:.75;animation:btnpulse 1s ease-in-out infinite;cursor:progress}
 @keyframes btnpulse{0%,100%{opacity:.55}50%{opacity:.9}}
 .card.mini[data-justplaced]{animation:landflash 1.1s ease-out 1}
@@ -182,6 +180,20 @@ h1,h2,h3,.num{font-family:"Bricolage Grotesque",Inter,sans-serif}
 .btn.ghost{background:transparent}
 .btn.dim{opacity:.55}
 .btn.trade{padding:8px 12px;min-height:40px;font-size:12.5px;border-radius:12px}
+
+/* ---- kopbalk: één familie ----
+   stapel, gespeeld, beurt, QR en nieuw spel delen vorm, hoogte en tekstgrootte.
+   Alleen de vulling verschilt naar functie: doorzichtig = aflezen, gevuld = knop,
+   spelerkleur = aan de beurt.
+   Dit blok staat bewust ná .btn.ghost, anders wint die met zijn doorzichtige achtergrond.
+   Geen display hier: dat zou .chip-status{display:none} op smalle schermen overschrijven,
+   en ook de .hidden-schakelaar van het gespeeld-veld. */
+.top .chip,.top .btn{border-radius:999px;min-height:36px;padding:0 13px;gap:7px;font-size:13px;
+  align-items:center;justify-content:center;opacity:1}
+.top .chip-status{border-color:var(--line)}
+/* :not(.off) — de QR-knop heeft in de uit-stand zijn eigen tint; die regel staat hierboven
+   en zou hier op specificiteit van moeten winnen, maar zo is er geen twijfel over. */
+.top .btn:not(.off){background:var(--surface2)}
 .gamelog{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px}
 .glhead{font-size:10.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
 .glhead span{opacity:.7;letter-spacing:0}
@@ -511,6 +523,8 @@ details.rules ul{margin:12px 2px 0;padding-left:20px;color:var(--muted);font-siz
   .chip{padding:5px 8px;font-size:11px}
   .chip-status{display:none}
   .turnchip{font-size:13px;padding:7px 11px}
+  /* beurt-veld even hoog als de knoppen ernaast */
+  .top .chip{min-height:44px}
   #soundBtn,#qrBtn,#restartBtn{min-height:44px;min-width:44px;padding:8px 10px;font-size:12px;justify-content:center}
   .btn.trade{min-height:44px}
   #qrBtn .qrlbl{display:none}
@@ -4099,7 +4113,7 @@ function tagStarts(){G.players.forEach(p=>{if(p.tl[0])p.tl[0].__start=true;});}
 let NPLAYERS=2;
 const NAMES=['Speler 1','Speler 2','Speler 3','Speler 4','Speler 5','Speler 6'];
 /* ===== meertaligheid (NL/EN/DE) ===== */
-const APP_VERSION='KweetHet.05-08-26k';   // versienummer: KweetHet.<dd-mm-jj>
+const APP_VERSION='KweetHet.05-08-26l';   // versienummer: KweetHet.<dd-mm-jj>
 let LANG = (()=>{ try{ const l=localStorage.getItem('kweethet.lang.v1'); return (l==='en'||l==='de'||l==='nl')?l:'nl'; }catch(e){ return 'nl'; } })();
 const TR={
  nl:{
