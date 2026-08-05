@@ -200,11 +200,9 @@ h1,h2,h3,.num{font-family:"Bricolage Grotesque",Inter,sans-serif}
 
 /* players */
 .players{display:grid;gap:14px}
-.players.many{grid-template-columns:repeat(auto-fit,minmax(430px,1fr))}
-.players.many .card,.players.many .card.mini{width:104px;min-height:112px;padding:9px 8px}
-.players.many .card .yr{font-size:26px;margin-bottom:4px}
-.players.many .card .ar{font-size:11px}
-.players.many .card .ti{font-size:10px}
+/* 3+ spelers: wie aan de beurt is neemt de volledige breedte, de rest staat eronder */
+.players.many{display:flex;flex-direction:column;gap:14px}
+.players.many .others{display:flex;flex-direction:column;gap:10px;min-width:0}
 .player{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;position:relative;transition:.2s box-shadow,.2s border-color;min-width:0}
 .player .tl{max-width:100%}
 .player.collapsed{cursor:pointer;padding:10px 14px;transition:.15s}
@@ -3908,6 +3906,7 @@ function render(){
   const narrow = window.matchMedia('(max-width:620px)').matches;
   const canCollapse = G.phase!=='win' && (G.players.length>=3 || (G.players.length===2 && narrow));
   if(!G.expanded) G.expanded={};
+  const playerEls=[];
   G.players.forEach((pl,k)=>{
     pl.tokens=Math.max(0,Math.min(TOKMAX,pl.tokens|0));
     const active=k===G.cur;
@@ -3953,7 +3952,7 @@ function render(){
 
     if(collapsed){
       pv.onclick=()=>{ G.expanded[k]=true; render(); };
-      box.appendChild(pv);
+      playerEls.push({el:pv,active});
       return;
     }
 
@@ -3993,8 +3992,19 @@ function render(){
       tl.insertBefore(pend,target.nextSibling);
     }
     pv.appendChild(tl);
-    box.appendChild(pv);
+    playerEls.push({el:pv,active});
   });
+
+  // 3+ spelers: wie aan de beurt is krijgt de volledige breedte, de rest komt eronder
+  if(G.players.length>2){
+    const activeItem=playerEls.find(x=>x.active);
+    if(activeItem) box.appendChild(activeItem.el);
+    const others=el('div','others');
+    playerEls.filter(x=>!x.active).forEach(x=>others.appendChild(x.el));
+    box.appendChild(others);
+  } else {
+    playerEls.forEach(x=>box.appendChild(x.el));
+  }
 
   // tijdlijn automatisch naar de zojuist geplaatste kaart schuiven
   requestAnimationFrame(()=>{
@@ -4066,7 +4076,7 @@ function tagStarts(){G.players.forEach(p=>{if(p.tl[0])p.tl[0].__start=true;});}
 let NPLAYERS=2;
 const NAMES=['Speler 1','Speler 2','Speler 3','Speler 4','Speler 5','Speler 6'];
 /* ===== meertaligheid (NL/EN/DE) ===== */
-const APP_VERSION='KweetHet.05-08-26d';   // versienummer: KweetHet.<dd-mm-jj>
+const APP_VERSION='KweetHet.05-08-26e';   // versienummer: KweetHet.<dd-mm-jj>
 let LANG = (()=>{ try{ const l=localStorage.getItem('kweethet.lang.v1'); return (l==='en'||l==='de'||l==='nl')?l:'nl'; }catch(e){ return 'nl'; } })();
 const TR={
  nl:{
