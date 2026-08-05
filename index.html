@@ -589,15 +589,9 @@ body.kermis::after{
 .kermis-wheel.w1{left:-55px;bottom:-55px;width:210px}
 .kermis-wheel.w2{right:-60px;top:90px;width:70px;opacity:.11}
 
-body.kermis .brand{
-  font-family:"Bricolage Grotesque",Inter,sans-serif;text-transform:uppercase;letter-spacing:.045em;color:var(--kgold);
-  text-shadow:0 1px 0 #8a4600,0 2px 0 #6a3200,0 3px 0 #4a2200,0 4px 8px rgba(0,0,0,.55),0 0 20px rgba(255,206,67,.55);}
-body.kermis .brand .vinyl svg circle:first-child{fill:var(--kred)!important}
-body.kermis .brand .vinyl{filter:drop-shadow(0 0 8px rgba(255,206,67,.7))}
-body.kermis .kermis-ribbon{display:inline-block;margin-left:10px;padding:4px 12px 5px;
-  font:800 11px/1 "Bricolage Grotesque",Inter,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#4a1200;position:relative;top:-3px;
-  background:linear-gradient(180deg,#ffe07a,var(--kgold) 60%,var(--kgold2));border-radius:6px;
-  box-shadow:0 2px 0 #9a6400,0 6px 12px -6px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.5);}
+/* het logo blijft in het kermis-thema precies gelijk aan het standaard logo:
+   kleuren van :root hier lokaal terugzetten, want body.kermis wijzigt --brand/--ink/--muted */
+body.kermis .brand{--brand:#e63562;--muted:#948da9;color:#f3f0fb}
 
 .kermis-deco{position:relative;width:100%;margin:-2px 0 14px;pointer-events:none;user-select:none}
 .kermis-scallop{height:15px;background:repeating-linear-gradient(90deg,var(--kred) 0 24px,var(--kcream) 24px 48px);
@@ -4078,7 +4072,7 @@ function tagStarts(){G.players.forEach(p=>{if(p.tl[0])p.tl[0].__start=true;});}
 let NPLAYERS=2;
 const NAMES=['Speler 1','Speler 2','Speler 3','Speler 4','Speler 5','Speler 6'];
 /* ===== meertaligheid (NL/EN/DE) ===== */
-const APP_VERSION='KweetHet.05-08-26i';   // versienummer: KweetHet.<dd-mm-jj>
+const APP_VERSION='KweetHet.05-08-26j';   // versienummer: KweetHet.<dd-mm-jj>
 let LANG = (()=>{ try{ const l=localStorage.getItem('kweethet.lang.v1'); return (l==='en'||l==='de'||l==='nl')?l:'nl'; }catch(e){ return 'nl'; } })();
 const TR={
  nl:{
@@ -4478,9 +4472,6 @@ function removeKermisDecor(){ document.querySelectorAll('.kermis-deco,.kermis-wh
 function buildKermisDecor(){
   removeKermisDecor();
   var wrap=document.querySelector('.wrap'); if(wrap) wrap.insertBefore(kMakeDeco(210), wrap.firstChild);
-  document.querySelectorAll('.brand').forEach(function(br){
-    var r=document.createElement('span'); r.className='kermis-ribbon'; r.textContent='Kermis-editie'; br.appendChild(r);
-  });
   var modal=document.querySelector('#setup .modal');
   if(modal){ var sb=modal.querySelector('.brand'); var dd=kMakeDeco(72); if(sb) sb.after(dd); else modal.insertBefore(dd,modal.firstChild); }
   document.body.appendChild(kFerris('w1')); document.body.appendChild(kFerris('w2'));
