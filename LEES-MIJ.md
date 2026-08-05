@@ -45,9 +45,18 @@ Je hebt nu een icoon zoals een gewone app: schermvullend, zonder adresbalk.
   de oude uit de cache.
 - Iedereen met de link kan het spel spelen; je kunt 'm dus delen.
 
+## Licentie
+
+`LICENSE.md` legt vast dat de code en de samengestelde nummerlijst van jou zijn
+en niet vrij te hergebruiken. Upload dat bestand mee; GitHub toont het dan
+automatisch bij je repository. Bovenaan `index.html` staat dezelfde melding,
+zodat wie de broncode bekijkt het meteen ziet.
+
 ## Bestanden
 - `index.html` — de app zelf
 - `manifest.webmanifest` — naam, kleuren en icoon voor het beginscherm
 - `sw.js` — zorgt dat de app offline werkt
 - `icon-192.png`, `icon-512.png`, `icon-maskable.png` — de iconen
 - `.nojekyll` — laat GitHub de bestanden ongewijzigd doorgeven
+- `LICENSE.md` — de gebruiksvoorwaarden
+- `CLAUDE.md` — projectafspraken voor als je met Claude Code verder werkt
