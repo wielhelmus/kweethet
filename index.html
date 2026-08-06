@@ -4195,7 +4195,7 @@ function tagStarts(){G.players.forEach(p=>{if(p.tl[0])p.tl[0].__start=true;});}
 let NPLAYERS=2;
 const NAMES=['Speler 1','Speler 2','Speler 3','Speler 4','Speler 5','Speler 6'];
 /* ===== meertaligheid (NL/EN/DE) ===== */
-const APP_VERSION='KweetHet.06-08-26g';   // versienummer: KweetHet.<dd-mm-jj>
+const APP_VERSION='KweetHet.06-08-26h';   // versienummer: KweetHet.<dd-mm-jj>
 let LANG = (()=>{ try{ const l=localStorage.getItem('kweethet.lang.v1'); return (l==='en'||l==='de'||l==='nl')?l:'nl'; }catch(e){ return 'nl'; } })();
 const TR={
  nl:{
@@ -4218,7 +4218,7 @@ const TR={
   histTipOn:'Deze nummers komen in een volgend potje niet terug',
   turnPill:'aan de beurt',
   collapseHint:'tik om uit te klappen',
-  installTitle:'Installeer als app', installSub:'Sneller starten, eigen venster', installBtn:'Installeer',
+  installTitle:'Installeer als app', installSub:'Sneller starten, eigen venster', installBtn:'Nu',
   iosInstallTitle:'Zet op beginscherm', iosInstallSub:'Werkt dan als een echte app', iosInstallBtn:'Hoe dan?',
   iosStep1:'Tik op Delen onderin Safari', iosStep2:'Scrol naar "Zet op beginscherm"', iosStep3:'Tik op "Voeg toe"',
   tradeBtn:'3 tokens → kaart ({n}/3)',
@@ -4296,7 +4296,7 @@ const TR={
   histTipOn:'These songs will not return in a next game',
   turnPill:'your turn',
   collapseHint:'tap to expand',
-  installTitle:'Install as app', installSub:'Faster start, own window', installBtn:'Install',
+  installTitle:'Install as app', installSub:'Faster start, own window', installBtn:'Now',
   iosInstallTitle:'Add to Home Screen', iosInstallSub:'Then it works like a real app', iosInstallBtn:'How?',
   iosStep1:'Tap Share at the bottom of Safari', iosStep2:'Scroll to "Add to Home Screen"', iosStep3:'Tap "Add"',
   tradeBtn:'3 tokens → card ({n}/3)',
@@ -4374,7 +4374,7 @@ const TR={
   histTipOn:'Diese Songs kommen im nächsten Spiel nicht wieder',
   turnPill:'am Zug',
   collapseHint:'zum Ausklappen tippen',
-  installTitle:'Als App installieren', installSub:'Schneller starten, eigenes Fenster', installBtn:'Installieren',
+  installTitle:'Als App installieren', installSub:'Schneller starten, eigenes Fenster', installBtn:'Jetzt',
   iosInstallTitle:'Zum Home-Bildschirm', iosInstallSub:'Funktioniert dann wie eine echte App', iosInstallBtn:'Wie?',
   iosStep1:'Tippe unten in Safari auf Teilen', iosStep2:'Scrolle zu "Zum Home-Bildschirm"', iosStep3:'Tippe auf "Hinzufügen"',
   tradeBtn:'3 Tokens → Karte ({n}/3)',
@@ -5137,18 +5137,57 @@ function buildPickDropdown(container, options, currentValue, onSelect, iconFor){
   const wrap=el('div','pickdrop');
   const btn=el('button','pickdrop-btn',`<span data-role="current">${rowHTML(cur)}</span>${ICON.chevDown}`);
   btn.type='button';
-  btn.onclick=(e)=>{ e.stopPropagation(); const wasOpen=wrap.classList.contains('open'); closeAllPickdrops(); if(!wasOpen) wrap.classList.add('open'); };
+  btn.setAttribute('aria-haspopup','listbox');
+  btn.setAttribute('aria-expanded','false');
   const menu=el('div','pickdrop-menu');
+  menu.setAttribute('role','listbox');
+  const items=[];
+  const openMenu=(focusItem)=>{
+    closeAllPickdrops();
+    wrap.classList.add('open');
+    btn.setAttribute('aria-expanded','true');
+    if(focusItem){ const idx=Math.max(0,items.findIndex(it=>it.dataset.value===cur.value)); items[idx].focus(); }
+  };
+  const closeMenu=(focusBtn)=>{
+    wrap.classList.remove('open');
+    btn.setAttribute('aria-expanded','false');
+    if(focusBtn) btn.focus();
+  };
+  btn.onclick=(e)=>{ e.stopPropagation(); const wasOpen=wrap.classList.contains('open'); closeAllPickdrops(); if(!wasOpen) openMenu(false); };
+  // pijltje-omlaag/omhoog vanaf de gesloten knop opent het menu meteen op de huidige keuze
+  btn.onkeydown=(e)=>{
+    if(e.key==='ArrowDown'||e.key==='ArrowUp'){ e.preventDefault(); openMenu(true); }
+    else if(e.key==='Escape'){ closeMenu(false); }
+  };
   options.forEach(o=>{
     const item=el('button','pickdrop-item'+(o.value===cur.value?' on':''),`${rowHTML(o)}${ICON.check}`);
     item.type='button';
-    item.onclick=(e)=>{ e.stopPropagation(); wrap.classList.remove('open'); onSelect(o.value); };
+    item.dataset.value=o.value;
+    item.setAttribute('role','option');
+    item.setAttribute('aria-selected', o.value===cur.value?'true':'false');
+    item.tabIndex=-1; // niet los tabbaar; binnen het open menu navigeer je met de pijltjestoetsen
+    item.onclick=(e)=>{ e.stopPropagation(); closeMenu(true); onSelect(o.value); };
+    item.onkeydown=(e)=>{
+      const i=items.indexOf(item);
+      if(e.key==='ArrowDown'){ e.preventDefault(); items[Math.min(i+1,items.length-1)].focus(); }
+      else if(e.key==='ArrowUp'){ e.preventDefault(); items[Math.max(i-1,0)].focus(); }
+      else if(e.key==='Home'){ e.preventDefault(); items[0].focus(); }
+      else if(e.key==='End'){ e.preventDefault(); items[items.length-1].focus(); }
+      else if(e.key==='Escape'){ e.preventDefault(); closeMenu(true); }
+      else if(e.key==='Tab'){ closeMenu(false); }
+    };
+    items.push(item);
     menu.appendChild(item);
   });
   wrap.appendChild(btn); wrap.appendChild(menu);
   container.appendChild(wrap);
 }
-function closeAllPickdrops(){ document.querySelectorAll('.pickdrop.open').forEach(d=>d.classList.remove('open')); }
+function closeAllPickdrops(){
+  document.querySelectorAll('.pickdrop.open').forEach(d=>{
+    d.classList.remove('open');
+    const b=d.querySelector('.pickdrop-btn'); if(b) b.setAttribute('aria-expanded','false');
+  });
+}
 document.addEventListener('click', closeAllPickdrops);
 // bij het kruisen van de breakpoint (venster verslepen) de vier velden herbouwen
 let WAS_WIDE_SETUP=null;

@@ -1,5 +1,5 @@
 /* KweetHet service worker — app offline beschikbaar, muziek altijd live */
-const CACHE = 'kweethet-06-08-26g';
+const CACHE = 'kweethet-06-08-26h';
 const ASSETS = [
   './',
   './index.html',
