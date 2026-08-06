@@ -438,6 +438,8 @@ body.kermis .wchip b{color:var(--kgold)}
 details.rules{margin-top:16px;margin-bottom:22px}
 .verlbl{margin-top:14px;text-align:center;font-size:11.5px;color:var(--muted);opacity:.75;letter-spacing:.02em}
 .vermaker{display:block;margin-top:3px;font-size:11px;opacity:.85}
+.lic-link{color:inherit;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:2px}
+.lic-link:hover,.lic-link:focus-visible{text-decoration-color:currentColor}
 .histbox{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap;
   margin-top:12px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg2);
   font-size:13px;color:var(--muted)}
@@ -4124,13 +4126,13 @@ function tagStarts(){G.players.forEach(p=>{if(p.tl[0])p.tl[0].__start=true;});}
 let NPLAYERS=2;
 const NAMES=['Speler 1','Speler 2','Speler 3','Speler 4','Speler 5','Speler 6'];
 /* ===== meertaligheid (NL/EN/DE) ===== */
-const APP_VERSION='KweetHet.06-08-26';   // versienummer: KweetHet.<dd-mm-jj>
+const APP_VERSION='KweetHet.06-08-26b';   // versienummer: KweetHet.<dd-mm-jj>
 let LANG = (()=>{ try{ const l=localStorage.getItem('kweethet.lang.v1'); return (l==='en'||l==='de'||l==='nl')?l:'nl'; }catch(e){ return 'nl'; } })();
 const TR={
  nl:{
   langName:'Nederlands', brand:'KweetHet',
   chance:'Kans', resetMix:'Standaardverdeling herstellen',
-  madeBy:'Gemaakt door Willem Bakker &amp; Claude',
+  madeByPrefix:'Gemaakt door ',
   editLists:'Lijsten en kansen aanpassen', listsTitle:'Lijsten en kansen',
   clipPlaying:'Speelt af — fragment {i} van {n}. Plaats de kaart op je tijdlijn.',
   alreadyPlaced:'Je hebt de kaart al geplaatst — draai eerst om.',
@@ -4204,7 +4206,7 @@ const TR={
  en:{
   langName:'English', brand:'KnowIt',
   chance:'Chance', resetMix:'Restore default mix',
-  madeBy:'Made by Willem Bakker &amp; Claude',
+  madeByPrefix:'Made by ',
   editLists:'Adjust lists and chances', listsTitle:'Lists and chances',
   clipPlaying:'Playing — clip {i} of {n}. Place the card on your timeline.',
   alreadyPlaced:'You already placed the card — flip it over first.',
@@ -4278,7 +4280,7 @@ const TR={
  de:{
   langName:'Deutsch', brand:'WeißIch',
   chance:'Chance', resetMix:'Standardverteilung wiederherstellen',
-  madeBy:'Erstellt von Willem Bakker &amp; Claude',
+  madeByPrefix:'Erstellt von ',
   editLists:'Listen und Chancen anpassen', listsTitle:'Listen und Chancen',
   clipPlaying:'Läuft — Ausschnitt {i} von {n}. Lege die Karte auf deine Zeitleiste.',
   alreadyPlaced:'Du hast die Karte schon gelegt — dreh sie erst um.',
@@ -4351,7 +4353,7 @@ const TR={
  }
 };
 function t(k,v){ let s=(TR[LANG]&&TR[LANG][k]); if(s==null)s=TR.nl[k]; if(s==null)s=k; if(v)for(const key in v)s=s.split('{'+key+'}').join(v[key]); return s; }
-function applyI18n(){ try{ document.documentElement.lang=LANG; document.title=t('brand'); const _v=document.getElementById('verLbl'); if(_v) _v.innerHTML=APP_VERSION.replace('KweetHet', t('brand'))+'<span class="vermaker">'+t('madeBy')+'</span>'; }catch(e){} document.querySelectorAll('[data-i18n]').forEach(function(e){ e.innerHTML=t(e.getAttribute('data-i18n')); }); }
+function applyI18n(){ try{ document.documentElement.lang=LANG; document.title=t('brand'); const _v=document.getElementById('verLbl'); if(_v) _v.innerHTML=APP_VERSION.replace('KweetHet', t('brand'))+'<span class="vermaker">'+t('madeByPrefix')+'<a class="lic-link" href="LICENSE.md" target="_blank" rel="noopener">Willem Bakker &amp; Claude</a></span>'; }catch(e){} document.querySelectorAll('[data-i18n]').forEach(function(e){ e.innerHTML=t(e.getAttribute('data-i18n')); }); }
 function setLang(l){ if(!TR[l])return; LANG=l; try{localStorage.setItem('kweethet.lang.v1',l);}catch(e){} applyI18n(); if(typeof buildSetup==='function')buildSetup(); if(typeof buildLangPick==='function')buildLangPick(); if(typeof refreshHist==='function')refreshHist(); if(typeof G!=='undefined'&&G&&G.players&&typeof render==='function')render(); }
 /* nationale vlaggen als SVG (emoji-vlaggen tonen niet op Windows) */
 const FLAG_SVG={
