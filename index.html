@@ -4193,7 +4193,7 @@ function tagStarts(){G.players.forEach(p=>{if(p.tl[0])p.tl[0].__start=true;});}
 let NPLAYERS=2;
 const NAMES=['Speler 1','Speler 2','Speler 3','Speler 4','Speler 5','Speler 6'];
 /* ===== meertaligheid (NL/EN/DE) ===== */
-const APP_VERSION='KweetHet.06-08-26e';   // versienummer: KweetHet.<dd-mm-jj>
+const APP_VERSION='KweetHet.06-08-26f';   // versienummer: KweetHet.<dd-mm-jj>
 let LANG = (()=>{ try{ const l=localStorage.getItem('kweethet.lang.v1'); return (l==='en'||l==='de'||l==='nl')?l:'nl'; }catch(e){ return 'nl'; } })();
 const TR={
  nl:{
@@ -4957,6 +4957,80 @@ const NL_NAMES=[
  'Zeyna','Zeyneb','Zeynep','Ziggy','Zion','Ziva','Ziyad','Zoe','Zoé','Zoë',
  'Zoey','Zofia','Zola','Zonne','Zora','Zoya','Zümra','Zuzanna','Zyan','Zyon'
 ];
+// aangeleverde lijst van 6 aug 2026, ontdubbeld (500 rijen -> 192 unieke namen);
+// wordt alleen gebruikt als Engels de actieve taal is
+const EN_NAMES=[
+ 'Aaron','Abigail','Adam','Alan','Albert','Alexander','Alice','Amanda','Amber','Amy',
+ 'Andrea','Andrew','Angela','Ann','Anna','Anthony','Arthur','Ashley','Austin','Barbara',
+ 'Benjamin','Betty','Beverly','Billy','Bobby','Brandon','Brenda','Brian','Brittany','Bruce',
+ 'Bryan','Carl','Carol','Carolyn','Charles','Charlotte','Cheryl','Christian','Christina','Christine',
+ 'Christopher','Cynthia','Daniel','Danielle','David','Deborah','Debra','Denise','Dennis','Diana',
+ 'Diane','Donald','Donna','Doris','Dorothy','Douglas','Dylan','Edward','Elizabeth','Emily',
+ 'Emma','Eric','Ethan','Eugene','Evelyn','Frances','Frank','Gabriel','Gary','George',
+ 'Gerald','Gloria','Grace','Gregory','Hannah','Harold','Heather','Helen','Henry','Isabella',
+ 'Jack','Jacob','Jacqueline','James','Janet','Janice','Jason','Jean','Jeffrey','Jennifer',
+ 'Jeremy','Jerry','Jesse','Jessica','Joan','Joe','John','Jonathan','Jordan','Jose',
+ 'Joseph','Joshua','Joyce','Juan','Judith','Judy','Julia','Julie','Justin','Karen',
+ 'Katherine','Kathleen','Kathryn','Keith','Kelly','Kenneth','Kevin','Kimberly','Kyle','Larry',
+ 'Laura','Lauren','Lawrence','Linda','Lisa','Logan','Louis','Madison','Margaret','Maria',
+ 'Marie','Marilyn','Mark','Martha','Mary','Matthew','Megan','Melissa','Michael','Michelle',
+ 'Nancy','Natalie','Nathan','Nicholas','Nicole','Noah','Olivia','Pamela','Patricia','Patrick',
+ 'Paul','Peter','Philip','Rachel','Ralph','Randy','Raymond','Rebecca','Richard','Robert',
+ 'Roger','Ronald','Roy','Russell','Ryan','Samantha','Samuel','Sandra','Sara','Sarah',
+ 'Scott','Sean','Sharon','Shirley','Sophia','Stephanie','Stephen','Steven','Susan','Teresa',
+ 'Terry','Theresa','Thomas','Timothy','Tyler','Victoria','Vincent','Walter','Wayne','William',
+ 'Willie','Zachary'
+];
+// aangeleverde lijst van 6 aug 2026; 19 namen hadden per ongeluk een volgnummer aan het eind
+// (bv. "Friedrich 231") -- dat bleek telkens een dubbeling van een al aanwezige naam, dus
+// opgeschoond en meteen weggededupliceerd (457 rijen -> 435 unieke namen);
+// wordt alleen gebruikt als Duits de actieve taal is
+const DE_NAMES=[
+ 'Aaron','Abel','Achille','Achim','Adele','Adelheid','Adrian','Agnes','Albert','Albrecht',
+ 'Alexander','Alexandra','Alfred','Alina','Alma','Alois','Amelie','Andreas','Andreas-Josef','Anja',
+ 'Anna','Anneliese','Annemarie','Annika','Anselm','Ansgar','Anton','Antonia','Armgard','Armin',
+ 'Arne','August','Barbara','Bastian','Beate','Benedikt','Benjamin','Bent','Bernadette','Bernd',
+ 'Bernhard','Bettina','Birgit','Bjorn','Bodo','Boje','Britta','Brunhilde','Bruno','Burkhard',
+ 'Carina','Carmen','Carsten','Caspar','Celina','Celine','Charlotte','Christel','Christian','Christina',
+ 'Christoph','Clara','Constantin','Cornelia','Cornelius','Dagmar','Dagny','Damian','Daniel','Daniela',
+ 'David','Deborah','Denise','Dennis','Detlef','Dieter','Dirk','Dominik','Dora','Dorothea',
+ 'Eckhard','Edda','Edith','Eduard','Eike','Ekkehard','Elena','Eleonore','Elfriede','Elian',
+ 'Elias','Elisa','Elisabeth','Ella','Ellen','Elmar','Elvira','Emanuel','Emil','Emilia',
+ 'Emma','Engelbert','Enno','Enrico','Erhard','Erik','Erika','Ernestine','Ernst','Eugen',
+ 'Eva','Ewald','Fabian','Fabienne','Falk','Falko','Felicitas','Felix','Fenja','Ferdinand',
+ 'Fiete','Finn','Fiona','Florentine','Florian','Florian-Josef','Frank','Franziska','Frederike','Frieda',
+ 'Friederike','Friedrich','Gabriel','Gabriele','Georg','Geraldine','Gerd','Gerhard','Gerlinde','Gero',
+ 'Gerrit','Gertrud','Gesine','Gisela','Giselher','Gotthard','Greta','Gundula','Gunther','Guntram',
+ 'Gustav','Hagen','Hannah','Hannelore','Hans','Harald','Harald-Juergen','Hartmut','Hauke','Hedwig',
+ 'Heidi','Heike','Heiko','Heinrich','Helene','Helga','Helge','Helmut','Hendrik','Henning',
+ 'Henrietta','Henriette','Hermann','Hildegard','Hinnerk','Holger','Horst','Ida','Ignaz','Ilse',
+ 'Imke','Ines','Ingmar','Ingo','Ingrid','Irene','Irma','Irmgard','Isabel','Isidor',
+ 'Isolde','Jacqueline','Jacqueline-Kathrin','Jakob','Jan','Jana','Jannik','Jelte','Jens','Jens-Uwe',
+ 'Jette','Joachim','Jochen','Johann','Johanna','Johannes','Johannes-Paul','Jolina','Jonas','Josef',
+ 'Josefa','Josefine','Judith','Jule','Julian','Jurgen','Justus','Kai','Kai-Uwe','Karina',
+ 'Karl','Karla','Karolin','Karoline','Katharina','Kilian','Kira','Klaas','Klara','Klaus',
+ 'Knut','Konrad','Konstanze','Korbinian','Kristin','Kristin-Marie','Lambert','Lambertine','Lara','Larissa',
+ 'Lasse','Laura','Laurenz','Lea','Lena','Lennart','Leon','Leonie','Leonora','Leonora-Maria',
+ 'Leopold','Lieselotte','Lilly','Lina','Linda','Lisa','Lisbeth','Lore','Lorenz','Louis',
+ 'Luca','Ludwig','Luisa','Luise','Lukas','Madita','Magdalena','Maja','Malina','Malte',
+ 'Manfred','Manuel','Manuel-Maria','Manuela','Marco','Maren','Margarete','Marie','Marina','Markus',
+ 'Marlene','Martha','Martin','Marvin','Mathilda','Matteo','Matthias','Maxim','Maximilian','Mechthild',
+ 'Meinhard','Melanie','Mia','Michael','Mila','Miriam','Monika','Moritz','Nadine','Natalie',
+ 'Nele','Nico','Nicola','Nicole','Niklas','Nikodem','Nils','Nina','Noah','Nora',
+ 'Norbert','Odilia','Ole','Oliver','Olivia','Onno','Oskar','Ottilie','Otto','Pamela',
+ 'Pascal','Patricia','Patrick','Paul','Paula','Paulina','Peer','Peerke','Peter','Petra',
+ 'Philine','Philipp','Quentin','Rafael','Raimund','Rainer','Ralf','Ramona','Raphaela','Rebecca',
+ 'Rebekka','Regina','Reiner','Renate','Renato','Ricarda','Richard','Robert','Robin','Roger',
+ 'Rolf','Romy','Ronald','Ronja','Rosa','Rosalie','Ruben','Ruediger','Rupert','Sabine',
+ 'Samuel','Sarah','Sascha','Sebastian','Sebastian-Paul','Selina','Serafina','Sibo','Siegfried','Sigmund',
+ 'Sigrid','Silke','Silvio','Simone','Sonja','Sophia','Sophie','Soren','Stefan','Stefanie',
+ 'Stefanus','Sven','Svenja','Tabea','Tammo','Tanja','Tatjana','Teresa','Thea','Theodor',
+ 'Theresa','Thilo','Thomas','Thorsten','Till','Tim','Timo','Tjark','Tobias','Ulf',
+ 'Ulrich','Ulrike','Urban','Ursula','Uta','Uwe','Valentin','Valerie','Vanessa','Veit',
+ 'Verena','Viktor','Viktoria','Viktoria-Maria','Vincent','Volker','Volker-Jan','Waldemar','Walter','Waltraud',
+ 'Wanda','Werner','Werner-Karl','Wiebke','Wilhelm','Wilhelmine','Wolfgang','Xaver','Xenia','Yannick',
+ 'Yelda','Yvonne','Zacharias','Zita','Zoe'
+];
 function usedNames(){
   try{ return JSON.parse(localStorage.getItem('kweethet.names.v1')||'[]'); }catch(e){ return []; }
 }
@@ -4972,9 +5046,9 @@ function rememberNames(names){
 }
 function allNameSuggestions(){
   const seen=new Set(), out=[];
-  // de aangeleverde naamlijst is Nederlandstalig en wordt daarom alleen voorgesteld
-  // als Nederlands ook de actieve taal is; eerder gebruikte namen blijven altijd meetellen
-  const pool = LANG==='nl' ? usedNames().concat(NL_NAMES) : usedNames();
+  // elke naamlijst hoort bij zijn eigen taal; eerder gebruikte namen blijven altijd meetellen
+  const byLang={nl:NL_NAMES, en:EN_NAMES, de:DE_NAMES};
+  const pool = usedNames().concat(byLang[LANG]||[]);
   pool.forEach(n=>{ const k=n.toLowerCase(); if(!seen.has(k)){ seen.add(k); out.push(n); } });
   return out;
 }
