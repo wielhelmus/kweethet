@@ -330,6 +330,24 @@ h1,h2,h3,.num{font-family:"Bricolage Grotesque",Inter,sans-serif}
 .modal{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:26px;max-width:460px;width:100%;max-height:90vh;max-height:90dvh;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .modal h2{margin:0 0 6px;font-size:24px;letter-spacing:-.02em}
 .modal p{color:var(--muted);font-size:14px;line-height:1.55;margin:0 0 18px}
+.install-chip{display:flex;align-items:center;gap:10px;background:var(--surface2);
+  border:1px solid var(--line);border-radius:14px;padding:11px 13px;margin-bottom:16px}
+.install-chip .ic{flex:none;width:34px;height:34px;border-radius:10px;background:var(--brand);
+  display:flex;align-items:center;justify-content:center;color:#fff}
+.install-chip .ic svg{width:18px;height:18px}
+.install-chip .tx{flex:1;min-width:0}
+.install-chip .tx b{display:block;font-size:13px;font-weight:700;color:var(--ink)}
+.install-chip .tx span{display:block;font-size:11.5px;color:var(--muted);margin-top:1px}
+.install-chip .go{flex:none;font:700 12px Inter,sans-serif;color:var(--brand);
+  background:none;border:0;padding:8px 4px;cursor:pointer;min-height:44px}
+.install-sheet{background:var(--surface2);border:1px solid var(--line);border-radius:14px;
+  padding:14px 16px 12px;margin:-8px 0 16px;display:none}
+.install-sheet.on{display:block}
+.install-sheet .row{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--ink);
+  padding:7px 0;border-bottom:1px solid var(--line)}
+.install-sheet .row:last-child{border-bottom:0}
+.install-sheet .row b{background:var(--brand);color:#fff;font-size:11px;font-weight:800;
+  width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex:none}
 .field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
 .field label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
 .field input{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;min-height:52px;color:var(--ink);font:600 16px Inter}
@@ -821,6 +839,7 @@ body.kermis #winName{color:var(--kgold);text-shadow:0 2px 10px rgba(255,206,67,.
     <div class="brand brand-setup"><span class="vinyl"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="var(--brand)"/><circle cx="20" cy="20" r="5.5" fill="#100e1c"/><circle cx="20" cy="20" r="2" fill="var(--brand)"/><path d="M20 3 A17 17 0 0 1 37 20" fill="none" stroke="#fff" stroke-width="2" opacity="0.4"/></svg></span><span data-i18n="brand">KweetHet</span></div>
     <h2 data-i18n="s_title">Klaar om te spelen?</h2>
     <p id="setupIntro"></p>
+    <div id="installChip" style="display:none"></div>
     <details class="rules">
       <summary data-i18n="s_rules">Spelregels & tokens</summary>
       <ul>
@@ -3246,6 +3265,7 @@ const ICON={
   sound:'<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M16 8a5 5 0 0 1 0 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
   mute:'<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M4 9v6h4l5 5V4L8 9H4z"/><path d="M17 9l4 4m0-4-4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
   trophy:'<svg viewBox="0 0 24 24" width="52" height="52" fill="currentColor" aria-hidden="true"><path d="M6 4h12v2h3v3a4 4 0 0 1-4 4h-.4A6 6 0 0 1 13 16.9V19h3v2H8v-2h3v-2.1A6 6 0 0 1 7.4 13H7a4 4 0 0 1-4-4V6h3V4zm12 4V6H6v2H5v1a2 2 0 0 0 2 2V8h1V6h8v2h1v3a2 2 0 0 0 2-2V8h-1z"/></svg>',
+  install:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 19h14"/></svg>',
 };
 const MAXP=6, MINP=2;
 function rgba(hex,a){const h=hex.replace('#','');const n=parseInt(h,16);
@@ -4126,7 +4146,7 @@ function tagStarts(){G.players.forEach(p=>{if(p.tl[0])p.tl[0].__start=true;});}
 let NPLAYERS=2;
 const NAMES=['Speler 1','Speler 2','Speler 3','Speler 4','Speler 5','Speler 6'];
 /* ===== meertaligheid (NL/EN/DE) ===== */
-const APP_VERSION='KweetHet.06-08-26b';   // versienummer: KweetHet.<dd-mm-jj>
+const APP_VERSION='KweetHet.06-08-26c';   // versienummer: KweetHet.<dd-mm-jj>
 let LANG = (()=>{ try{ const l=localStorage.getItem('kweethet.lang.v1'); return (l==='en'||l==='de'||l==='nl')?l:'nl'; }catch(e){ return 'nl'; } })();
 const TR={
  nl:{
@@ -4149,6 +4169,9 @@ const TR={
   histTipOn:'Deze nummers komen in een volgend potje niet terug',
   turnPill:'aan de beurt',
   collapseHint:'tik om uit te klappen',
+  installTitle:'Installeer als app', installSub:'Sneller starten, eigen venster', installBtn:'Installeer',
+  iosInstallTitle:'Zet op beginscherm', iosInstallSub:'Werkt dan als een echte app', iosInstallBtn:'Hoe dan?',
+  iosStep1:'Tik op Delen onderin Safari', iosStep2:'Scrol naar "Zet op beginscherm"', iosStep3:'Tik op "Voeg toe"',
   tradeBtn:'3 tokens → kaart ({n}/3)',
   tradeTip:'Altijd mogelijk, ook als je niet aan de beurt bent. De beurt loopt gewoon door.',
 
@@ -4223,6 +4246,9 @@ const TR={
   histTipOn:'These songs will not return in a next game',
   turnPill:'your turn',
   collapseHint:'tap to expand',
+  installTitle:'Install as app', installSub:'Faster start, own window', installBtn:'Install',
+  iosInstallTitle:'Add to Home Screen', iosInstallSub:'Then it works like a real app', iosInstallBtn:'How?',
+  iosStep1:'Tap Share at the bottom of Safari', iosStep2:'Scroll to "Add to Home Screen"', iosStep3:'Tap "Add"',
   tradeBtn:'3 tokens → card ({n}/3)',
   tradeTip:'Always possible, even when it is not your turn. The turn simply continues.',
 
@@ -4297,6 +4323,9 @@ const TR={
   histTipOn:'Diese Songs kommen im nächsten Spiel nicht wieder',
   turnPill:'am Zug',
   collapseHint:'zum Ausklappen tippen',
+  installTitle:'Als App installieren', installSub:'Schneller starten, eigenes Fenster', installBtn:'Installieren',
+  iosInstallTitle:'Zum Home-Bildschirm', iosInstallSub:'Funktioniert dann wie eine echte App', iosInstallBtn:'Wie?',
+  iosStep1:'Tippe unten in Safari auf Teilen', iosStep2:'Scrolle zu "Zum Home-Bildschirm"', iosStep3:'Tippe auf "Hinzufügen"',
   tradeBtn:'3 Tokens → Karte ({n}/3)',
   tradeTip:'Immer möglich, auch wenn du nicht am Zug bist. Der Zug läuft normal weiter.',
 
@@ -4707,7 +4736,41 @@ function attachSuggest(inp, menu){
   inp.addEventListener('blur', ()=>{ setTimeout(close,120); });   // korte vertraging voor de tik
   function paint(){ [...menu.children].forEach((c,i)=>c.classList.toggle('on',i===active)); }
 }
+// "installeer als app": Chrome/Edge vangen dit signaal zelf op; Safari op iOS niet (daar
+// kan alleen een handmatige instructie getoond worden); al geïnstalleerd -> niets tonen.
+let DEFERRED_INSTALL=null;
+const IS_IOS=/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+function isStandaloneApp(){ return window.matchMedia('(display-mode: standalone)').matches || navigator.standalone===true; }
+window.addEventListener('beforeinstallprompt',(e)=>{ e.preventDefault(); DEFERRED_INSTALL=e; renderInstallChip(); });
+window.addEventListener('appinstalled',()=>{ DEFERRED_INSTALL=null; renderInstallChip(); });
+function renderInstallChip(){
+  const box=$('#installChip'); if(!box) return;
+  if(isStandaloneApp() || (!DEFERRED_INSTALL && !IS_IOS)){ box.style.display='none'; box.innerHTML=''; return; }
+  box.style.display='block';
+  if(DEFERRED_INSTALL){
+    box.innerHTML=`<div class="install-chip"><div class="ic">${ICON.install}</div>
+      <div class="tx"><b>${t('installTitle')}</b><span>${t('installSub')}</span></div>
+      <button class="go" id="installGo">${t('installBtn')}</button></div>`;
+    $('#installGo').onclick=async()=>{
+      if(!DEFERRED_INSTALL)return;
+      DEFERRED_INSTALL.prompt();
+      try{ await DEFERRED_INSTALL.userChoice; }catch(e){}
+      DEFERRED_INSTALL=null; renderInstallChip();
+    };
+  } else if(IS_IOS){
+    box.innerHTML=`<div class="install-chip"><div class="ic">${ICON.install}</div>
+      <div class="tx"><b>${t('iosInstallTitle')}</b><span>${t('iosInstallSub')}</span></div>
+      <button class="go" id="installGo">${t('iosInstallBtn')}</button></div>
+      <div class="install-sheet" id="iosSheet">
+        <div class="row"><b>1</b>${t('iosStep1')}</div>
+        <div class="row"><b>2</b>${t('iosStep2')}</div>
+        <div class="row"><b>3</b>${t('iosStep3')}</div>
+      </div>`;
+    $('#installGo').onclick=()=>{ $('#iosSheet').classList.toggle('on'); };
+  }
+}
 function buildSetup(){
+  renderInstallChip();
   const woord=t('w'+NPLAYERS)||String(NPLAYERS);
   $('#setupIntro').innerHTML=t('s_intro',{word:woord, clock:(NPLAYERS>2?t('clockNL'):''), win:WIN});
   const pc=$('#pCount'); pc.innerHTML='';
