@@ -352,6 +352,9 @@ h1,h2,h3,.num{font-family:"Bricolage Grotesque",Inter,sans-serif}
 .install-chip .tx span{display:block;font-size:11.5px;color:var(--muted);margin-top:1px}
 .install-chip .go{flex:none;font:700 12px Inter,sans-serif;color:var(--brand);
   background:none;border:0;padding:8px 4px;cursor:pointer;min-height:44px}
+/* hele kaartje als knop (geen aparte "Nu"-tekst) -- alleen voor de Chrome/Edge-variant */
+button.install-chip{width:100%;text-align:left;font:inherit;cursor:pointer;transition:.12s border-color}
+button.install-chip:hover,button.install-chip:focus-visible{border-color:var(--brand)}
 .install-sheet{background:var(--surface2);border:1px solid var(--line);border-radius:14px;
   padding:14px 16px 12px;margin:-8px 0 16px;display:none}
 .install-sheet.on{display:block}
@@ -4195,7 +4198,7 @@ function tagStarts(){G.players.forEach(p=>{if(p.tl[0])p.tl[0].__start=true;});}
 let NPLAYERS=2;
 const NAMES=['Speler 1','Speler 2','Speler 3','Speler 4','Speler 5','Speler 6'];
 /* ===== meertaligheid (NL/EN/DE) ===== */
-const APP_VERSION='KweetHet.06-08-26h';   // versienummer: KweetHet.<dd-mm-jj>
+const APP_VERSION='KweetHet.06-08-26i';   // versienummer: KweetHet.<dd-mm-jj>
 let LANG = (()=>{ try{ const l=localStorage.getItem('kweethet.lang.v1'); return (l==='en'||l==='de'||l==='nl')?l:'nl'; }catch(e){ return 'nl'; } })();
 const TR={
  nl:{
@@ -4218,7 +4221,7 @@ const TR={
   histTipOn:'Deze nummers komen in een volgend potje niet terug',
   turnPill:'aan de beurt',
   collapseHint:'tik om uit te klappen',
-  installTitle:'Installeer als app', installSub:'Sneller starten, eigen venster', installBtn:'Nu',
+  installTitle:'Installeer als app', installSub:'Sneller starten, eigen venster',
   iosInstallTitle:'Zet op beginscherm', iosInstallSub:'Werkt dan als een echte app', iosInstallBtn:'Hoe dan?',
   iosStep1:'Tik op Delen onderin Safari', iosStep2:'Scrol naar "Zet op beginscherm"', iosStep3:'Tik op "Voeg toe"',
   tradeBtn:'3 tokens → kaart ({n}/3)',
@@ -4296,7 +4299,7 @@ const TR={
   histTipOn:'These songs will not return in a next game',
   turnPill:'your turn',
   collapseHint:'tap to expand',
-  installTitle:'Install as app', installSub:'Faster start, own window', installBtn:'Now',
+  installTitle:'Install as app', installSub:'Faster start, own window',
   iosInstallTitle:'Add to Home Screen', iosInstallSub:'Then it works like a real app', iosInstallBtn:'How?',
   iosStep1:'Tap Share at the bottom of Safari', iosStep2:'Scroll to "Add to Home Screen"', iosStep3:'Tap "Add"',
   tradeBtn:'3 tokens → card ({n}/3)',
@@ -4374,7 +4377,7 @@ const TR={
   histTipOn:'Diese Songs kommen im nächsten Spiel nicht wieder',
   turnPill:'am Zug',
   collapseHint:'zum Ausklappen tippen',
-  installTitle:'Als App installieren', installSub:'Schneller starten, eigenes Fenster', installBtn:'Jetzt',
+  installTitle:'Als App installieren', installSub:'Schneller starten, eigenes Fenster',
   iosInstallTitle:'Zum Home-Bildschirm', iosInstallSub:'Funktioniert dann wie eine echte App', iosInstallBtn:'Wie?',
   iosStep1:'Tippe unten in Safari auf Teilen', iosStep2:'Scrolle zu "Zum Home-Bildschirm"', iosStep3:'Tippe auf "Hinzufügen"',
   tradeBtn:'3 Tokens → Karte ({n}/3)',
@@ -5103,9 +5106,8 @@ function renderInstallChip(){
   if(isStandaloneApp() || (!DEFERRED_INSTALL && !IS_IOS)){ box.style.display='none'; box.innerHTML=''; return; }
   box.style.display='block';
   if(DEFERRED_INSTALL){
-    box.innerHTML=`<div class="install-chip"><div class="ic">${ICON.install}</div>
-      <div class="tx"><b>${t('installTitle')}</b><span>${t('installSub')}</span></div>
-      <button class="go" id="installGo">${t('installBtn')}</button></div>`;
+    box.innerHTML=`<button class="install-chip" id="installGo" type="button"><div class="ic">${ICON.install}</div>
+      <div class="tx"><b>${t('installTitle')}</b><span>${t('installSub')}</span></div></button>`;
     $('#installGo').onclick=async()=>{
       if(!DEFERRED_INSTALL)return;
       DEFERRED_INSTALL.prompt();
