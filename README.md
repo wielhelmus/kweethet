@@ -1,6 +1,6 @@
 # KweetHet
 
-*[English version below](#knowit) · [Deutsche Version weiter unten](#deutsch)*
+*[English version below](#knowit) · [Deutsche Version weiter unten](#weißich)*
 
 Een muziekspel voor het scherm van je pc, laptop, telefoon of tv: de app speelt een
 nummer, jij raadt in welk jaar het uitkwam en legt de kaart op de juiste
@@ -37,7 +37,7 @@ Zie [LICENSE.md](LICENSE.md).
 
 ## KnowIt
 
-*Nederlandse versie hierboven · [Deutsche Version weiter unten](#deutsch)*
+*Nederlandse versie hierboven · [Deutsche Version weiter unten](#weißich)*
 
 A music quiz for your PC, laptop, phone or TV screen: the app plays a song, you guess
 the year it came out and place the card in the right spot on your
@@ -72,7 +72,7 @@ See [LICENSE.md](LICENSE.md).
 
 ---
 
-## Deutsch
+## WeißIch
 
 *Niederländische und englische Version weiter oben.*
 
