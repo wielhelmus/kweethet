@@ -3380,12 +3380,23 @@ const _ix  = c => (c && c.ix>=0) ? c.ix : -1;                 // kaart -> plek i
 const _ixs = a => (a||[]).map(_ix).filter(i=>i>=0);
 const _card= i => (i>=0 && ALL_CARDS[i]) ? mkCard(ALL_CARDS[i], i) : null;
 const _cards=a => (a||[]).map(_card).filter(Boolean);
+// steekproef-vingerafdruk van de kaartendata: de lengte alleen mist een wijziging die het aantal
+// kaarten ongemoeid laat (bv. een titel/jaartal gecorrigeerd) -- deze vangt zulke wijzigingen ook op,
+// zonder bij elke saveGame() de hele database (20k+ rijen) te moeten doorlopen (eenmalig berekend)
+const DECK_FINGERPRINT = (()=>{
+  let h=0;
+  for(let i=0;i<ALL_CARDS.length;i+=137){
+    const c=ALL_CARDS[i], s=c[0]+'|'+c[1]+'|'+c[2]+'|'+c[4];
+    for(let j=0;j<s.length;j++) h=(h*31+s.charCodeAt(j))|0;
+  }
+  return h;
+})();
 
 function saveGame(){
   try{
     if(!G || !G.players || G.phase==='win'){ return; }
     const d={
-      v:1, deck:ALL_CARDS.length, lang:LANG, win:WIN, lists:G.lists||[],
+      v:1, deck:ALL_CARDS.length, fp:DECK_FINGERPRINT, lang:LANG, win:WIN, lists:G.lists||[],
       piles:(G.piles||[]).map(_ixs), discard:_ixs(G.discard),
       players:(G.players||[]).map(p=>({n:p.name, t:p.tokens, tl:_ixs(p.tl)})),
       cur:G.cur, phase:G.phase, card:_ix(G.card), played:!!G.played,
@@ -3404,7 +3415,7 @@ function loadGame(){
     const raw=localStorage.getItem(SAVE_KEY); if(!raw) return false;
     const d=JSON.parse(raw);
     if(!d || d.v!==1 || !d.players || !d.players.length || d.phase==='win') return false;
-    if(d.deck!==ALL_CARDS.length){ clearSave(); return false; }   // stapel gewijzigd: posities kloppen niet meer
+    if(d.deck!==ALL_CARDS.length || (d.fp!=null && d.fp!==DECK_FINGERPRINT)){ clearSave(); return false; }   // stapel gewijzigd: posities kloppen niet meer
     if(d.lang && d.lang!==LANG) return false;            // andere taal = andere stapel
     G={
       piles:(d.piles||[]).map(_cards), discard:_cards(d.discard),
@@ -3641,16 +3652,17 @@ function pauseSong(){ if(audioEl){audioEl.pause();} G.playing=false; G.paused=tr
 function playClip(i){
   const clips=G.clips||[], a=getAudio();
   const lim=CLIP_SECS[CLIPLEN]||0;
-  if(i>=clips.length || (lim && i>=1)){ G.playing=false; G.paused=false; if(G.phase==='draw'){ G.msg=t('clipDone'); armTurtle(); } return render(); }
+  if(i>=clips.length || (lim && i>=1)){ G.playing=false; G.paused=false; if(G.phase==='draw'){ G.msg=t('clipDone'); armTurtle(); } render(); return Promise.resolve(); }
   G.clipIdx=i;
   a.src=clips[i].src;
   a.muted=!soundOn;
   a.ontimeupdate = lim ? function(){ if(a.currentTime>=lim){ a.ontimeupdate=null; a.onended&&a.onended(); } } : null;
+  const kaartBijStart=G.card;
   const pr=a.play();
   if(pr&&pr.then){
-    pr.then(()=>{ audioReady=true; G.playing=true; G.paused=false; G.played=true; G.audioFail=null; if(G.phase==='draw') G.msg=clipMsg(i,clips.length); render(); })
-      .catch(()=>{ G.playing=false; G.paused=true; if(G.phase==='draw') G.msg=t('msgTapAgain'); render(); });
-  }else{ G.playing=true; G.played=true; G.audioFail=null; if(G.phase==='draw') G.msg=clipMsg(i,clips.length); render(); }
+    return pr.then(()=>{ if(G.card!==kaartBijStart)return; audioReady=true; G.playing=true; G.paused=false; G.played=true; G.audioFail=null; if(G.phase==='draw') G.msg=clipMsg(i,clips.length); render(); })
+      .catch(()=>{ if(G.card!==kaartBijStart)return; G.playing=false; G.paused=true; if(G.phase==='draw') G.msg=t('msgTapAgain'); render(); });
+  }else{ G.playing=true; G.played=true; G.audioFail=null; if(G.phase==='draw') G.msg=clipMsg(i,clips.length); render(); return Promise.resolve(); }
 }
 // fragmenten alvast opzoeken zodra de kaart getrokken is
 function prefetchClips(card){
@@ -3671,45 +3683,54 @@ function prefetchClips(card){
   })();
   return G.clipsPromise;
 }
+let PLAY_BUSY=false;   // voorkomt dat snel dubbelklikken op Play de tijdsdruk-klok laat resetten
 async function playSong(){
-  const a=getAudio();
-  // 1) hervatten na pauze — direct in de klik, dus altijd toegestaan
-  if(G.paused && G.clips && G.clips.length){
-    try{ await a.play(); G.playing=true; G.paused=false; G.msg=clipMsg(G.clipIdx,G.clips.length); return render(); }catch(e){}
-  }
-  // 2) geluid ontgrendelen binnen de klik
-  unlockAudio();
-  // 3) fragmenten: meestal al vooraf opgehaald
-  if(!G.clips){
-    G.loadingAudio=true; G.audioFail=null; G.msg='Fragmenten zoeken…'; render();
-    try{ await (G.clipsPromise||prefetchClips(G.card)); }catch(e){}
-    G.loadingAudio=false;
-  }
-  if(!G.clips||!G.clips.length){
-    const offline=(typeof navigator!=='undefined'&&navigator.onLine===false);
-    if(G._netFail||offline){
-      G.audioFail='net'; G.clipsPromise=null;
-      G.msg=t('failNetFull');
-    }else{
-      G.audioFail='none';
-      G.msg=t('failNoneFull');
+  if(PLAY_BUSY) return;
+  PLAY_BUSY=true;
+  try{
+    const a=getAudio();
+    // 1) hervatten na pauze — direct in de klik, dus altijd toegestaan
+    if(G.paused && G.clips && G.clips.length){
+      try{ await a.play(); G.playing=true; G.paused=false; G.msg=clipMsg(G.clipIdx,G.clips.length); render(); return; }catch(e){}
+      return;
     }
-    return render();
+    // 2) geluid ontgrendelen binnen de klik
+    unlockAudio();
+    // 3) fragmenten: meestal al vooraf opgehaald
+    if(!G.clips){
+      G.loadingAudio=true; G.audioFail=null; G.msg=t('searching'); render();
+      try{ await (G.clipsPromise||prefetchClips(G.card)); }catch(e){}
+      G.loadingAudio=false;
+    }
+    if(!G.clips||!G.clips.length){
+      const offline=(typeof navigator!=='undefined'&&navigator.onLine===false);
+      if(G._netFail||offline){
+        G.audioFail='net'; G.clipsPromise=null;
+        G.msg=t('failNetFull');
+      }else{
+        G.audioFail='none';
+        G.msg=t('failNoneFull');
+      }
+      render();
+      return;
+    }
+    tdStart();
+    await playClip(0);
+  } finally {
+    PLAY_BUSY=false;
   }
-  tdStart();
-  playClip(0);
 }
 
 function skipCard(){const p=G.players[G.cur];
   if(G.chosen!=null){G.msg=t('alreadyPlaced');return render();}
   if(p.tokens<1){G.msg=t('skipNoToken',{name:p.name});return render();}
-  p.tokens--;G.discard.push(G.card);G.msg=t('skipPays',{name:p.name});drawNext();}
+  p.tokens--;G.discard.push(G.card);G.msg=t('skipPays',{name:p.name});tdClear();drawNext();}
 
 // gratis vervangen wanneer de app geen fragment kon vinden (niet de schuld van de speler)
 function otherSong(){
   if(G.phase!=='draw'&&G.phase!=='placed')return;
   if(G.chosen!=null){G.msg=t('alreadyPlaced');return render();}
-  G.discard.push(G.card);G.audioFail=null;G._netFail=false;
+  G.discard.push(G.card);G.audioFail=null;G._netFail=false;tdClear();
   G.msg=t('msgNoClipOther');drawNext();}
 
 function tradeCard(k){
@@ -3727,7 +3748,7 @@ function tradeCard(k){
 function chooseSlot(i){ if(G.phase!=='draw')return; hideTurtle(); tdClear(); G.chosen=i; G.phase='placed';
   G.msg=t('placed'); render(); }
 function unplace(){ if(G.phase!=='placed'||(G.challenges||[]).length)return; G.chosen=null; G.phase='draw';
-  G.msg=t('cardBack'); render(); }
+  G.msg=t('cardBack'); render(); tdStart(); }
 
 // meerdere tegenstanders mogen KweetHetBeter roepen, in volgorde van roepen
 function startChallenge(k){
@@ -3764,6 +3785,7 @@ function reveal(){
     out=t('okPlaced',{name:p.name,ar:c.ar,ti:c.ti,y:c.y});
     if(chs.length)out+=t('okChalMiss',{s:chs.length>1?'s':'',was:chs.length>1?t('wasN'):t('was1')});
     G.phase='reveal';G.reveal=c;G.msg=out;G.cheer=G.cur;
+    if(kOn())kCorrect();
     logSong(c,`${p.name} · goed`);
     if(p.tl.length>=WIN){render();return win(G.cur);}
     render(); if(chs.length) showCactus(); return;
@@ -3777,6 +3799,7 @@ function reveal(){
     out=t('steal',{name:st.name,ar:c.ar,ti:c.ti,y:c.y});
     if(chs.length>1)out+=t('stealOthers',{s2:chs.length>2?'s':'',went:chs.length>2?t('wentN'):t('went1')});
     G.phase='reveal';G.reveal=c;G.msg=out;G.cheer=winnerCh.by;G.sob=G.cur;
+    if(kOn())kWrong();
     logSong(c,`${st.name} · gestolen`);
     if(st.tl.length>=WIN){render();return win(winnerCh.by);}
     return render();
@@ -3786,6 +3809,7 @@ function reveal(){
   out=t('wrong',{ar:c.ar,ti:c.ti,y:c.y});
   if(chs.length)out+=t('wrongChal',{ken:chs.length>1?'ken':'',sat:chs.length>1?t('satN'):t('sat1')});
   G.phase='reveal';G.reveal=c;G.msg=out;G.sob=G.cur;
+  if(kOn())kWrong();
   logSong(c,`${p.name} · fout`);
   render(); if(chs.length) showCactus();
 }
@@ -3948,7 +3972,7 @@ function win(k){
     `<div class="winstat"><div class="n">${w.tl.length}</div><div class="l">${t('cards')}</div></div>`+
     `<div class="winstat"><div class="n">${w.tokens}</div><div class="l">${t('tokensLeft')}</div></div>`+
     G.players.map((pl,i)=>i===k?'':
-      `<div class="winstat"><div class="n" style="color:${PCOL[i+1]}">${pl.tl.length}</div><div class="l">${pl.name}</div></div>`
+      `<div class="winstat"><div class="n" style="color:${PCOL[i+1]}">${pl.tl.length}</div><div class="l">${esc(pl.name)}</div></div>`
     ).join('');
   renderWinHist(k);
   ov.style.display='grid';
@@ -3969,7 +3993,7 @@ function render(){
   const tc=$('#turnChip');tc.style.display=G.phase==='win'?'none':'flex';
   tc.style.setProperty('--tcol', PCOL[G.cur+1]);
   tc.style.setProperty('--tink', inkOn(PCOL[G.cur+1]));
-  tc.innerHTML=`<span style="width:9px;height:9px;border-radius:50%;background:var(--tink,#fff)"></span> <span class="turnlbl">${t('hdrTurn')} </span><b>${G.players[G.cur].name}</b>`;
+  tc.innerHTML=`<span style="width:9px;height:9px;border-radius:50%;background:var(--tink,#fff)"></span> <span class="turnlbl">${t('hdrTurn')} </span><b>${esc(G.players[G.cur].name)}</b>`;
   $('#restartBtn').style.display='inline-flex';
   { const qb=$('#qrBtn'); if(qb){ qb.style.display='inline-flex';
       // bij "uit" hetzelfde icoon, maar vager en doorgestreept: op smalle schermen valt het
@@ -4077,7 +4101,7 @@ function render(){
     if(cheering){ mood='happy'; setTimeout(()=>{ if(G.cheer===k) G.cheer=null; },1700); }  // net goed gespeeld: juichen
     const sobbing = G.sob===k;
     if(sobbing){ mood='sad'; setTimeout(()=>{ if(G.sob===k) G.sob=null; },1700); }          // net fout gespeeld: huilen
-    const nameWrap=el('div','pname',`${avatarSVG(k, mood)}<span class="pn">${pl.name}</span>`);
+    const nameWrap=el('div','pname',`${avatarSVG(k, mood)}<span class="pn">${esc(pl.name)}</span>`);
     if(cheering) nameWrap.querySelector('.avatar').classList.add('cheer');
     if(sobbing)  nameWrap.querySelector('.avatar').classList.add('sob');
     head.appendChild(nameWrap);
@@ -4171,9 +4195,9 @@ function render(){
       $('#glCount').textContent=`· ${log.length}`;
       $('#glList').innerHTML=log.map(e=>{
         const parts=(e.note||'').split(' · ');
-        const wie=parts[0]||'', uit=(parts[1]||'').toLowerCase();
+        const wie=esc(parts[0]||''), uit=(parts[1]||'').toLowerCase();
         const cls = uit==='goed'?'ok' : uit==='fout'?'no' : uit==='gestolen'?'steal' : uit==='ingeruild'?'trade' : '';
-        return `<li><span class="yr">${e.y}</span><span class="nm"><b>${e.ar}</b> <span>– ${e.ti}</span></span>`+
+        return `<li><span class="yr">${e.y}</span><span class="nm"><b>${esc(e.ar)}</b> <span>– ${esc(e.ti)}</span></span>`+
                `<span class="note ${cls}">${wie}${uit?` <b>${uit}</b>`:''}</span></li>`;
       }).join('');
     }else gl.style.display='none';
@@ -4221,7 +4245,7 @@ function tagStarts(){G.players.forEach(p=>{if(p.tl[0])p.tl[0].__start=true;});}
 let NPLAYERS=2;
 const NAMES=['Speler 1','Speler 2','Speler 3','Speler 4','Speler 5','Speler 6'];
 /* ===== meertaligheid (NL/EN/DE) ===== */
-const APP_VERSION='KweetHet.07-08-26h';   // versienummer: KweetHet.<dd-mm-jj>
+const APP_VERSION='KweetHet.07-08-26i';   // versienummer: KweetHet.<dd-mm-jj>
 let LANG = (()=>{ try{ const l=localStorage.getItem('kweethet.lang.v1'); return (l==='en'||l==='de'||l==='nl')?l:'nl'; }catch(e){ return 'nl'; } })();
 const TR={
  nl:{
@@ -4468,7 +4492,7 @@ const TR={
   cactus:'WeißNicht!', turtle:'Dauert Lang!'
  }
 };
-function t(k,v){ let s=(TR[LANG]&&TR[LANG][k]); if(s==null)s=TR.nl[k]; if(s==null)s=k; if(v)for(const key in v)s=s.split('{'+key+'}').join(v[key]); return s; }
+function t(k,v){ let s=(TR[LANG]&&TR[LANG][k]); if(s==null)s=TR.nl[k]; if(s==null)s=k; if(v)for(const key in v)s=s.split('{'+key+'}').join(esc(v[key])); return s; }
 function applyI18n(){ try{ document.documentElement.lang=LANG; document.title=t('brand'); const _v=document.getElementById('verLbl'); if(_v) _v.innerHTML=APP_VERSION.replace('KweetHet', t('brand'))+'<span class="vermaker">'+t('madeByPrefix')+'<a class="lic-link" href="LICENSE.md" target="_blank" rel="noopener">Willem Bakker &amp; Claude</a></span>'; }catch(e){} document.querySelectorAll('[data-i18n]').forEach(function(e){ e.innerHTML=t(e.getAttribute('data-i18n')); }); }
 function setLang(l){ if(!TR[l])return; LANG=l; try{localStorage.setItem('kweethet.lang.v1',l);}catch(e){} applyI18n(); if(typeof buildSetup==='function')buildSetup(); if(typeof buildLangPick==='function')buildLangPick(); if(typeof refreshHist==='function')refreshHist(); if(typeof G!=='undefined'&&G&&G.players&&typeof render==='function')render(); }
 /* nationale vlaggen als SVG (emoji-vlaggen tonen niet op Windows) */
@@ -4512,7 +4536,36 @@ const LIST_INFO=[
 let LIST_SEL=[true,false,false,false,true,true,true,true,false];   // lijst 1,5,6,7,8 standaard aan, Alleen Nederlandstalig (9) standaard uit
 // weergavevolgorde in het instelscherm (lijst-index, niet het lijstnummer zelf): 2/3/4 onderaan, Alleen Nederlandstalig helemaal onderaan
 const LIST_ORDER=[0,4,5,6,7,1,2,3,8];
-function listCounts(){ const c=[0,0,0,0,0,0,0,0,0]; ALL_CARDS.forEach(x=>c[x[4]|0]++); return c; }
+// per lijst: hoeveel kaarten er daadwerkelijk uit te trekken zijn in de huidige taal
+// (dus mét de EN/DE Nederlands-uitsluiting, maar zonder kruis-lijst-ontdubbeling -- die hangt af
+// van welke ándere lijsten ook aangevinkt zijn, en heeft dus geen vaste betekenis per lijst op zich)
+function listCounts(){
+  const c=[0,0,0,0,0,0,0,0,0];
+  const filterTaal=LANG!=='nl';
+  ALL_CARDS.forEach(x=>{
+    const g=x[4]|0;
+    if(filterTaal && g!==8 && isDutchCard({ar:x[1],ti:x[2]})) return;
+    c[g]++;
+  });
+  return c;
+}
+// het werkelijke totaal voor de huidige selectie: taalfilter én kruis-lijst-ontdubbeling zoals newGame() die toepast
+function selectedTotal(){
+  const wantG=new Set(); LIST_SEL.forEach((on,g)=>{ if(on) wantG.add(g); });
+  const filterTaal=LANG!=='nl';
+  const seen=new Set();
+  let n=0;
+  ALL_CARDS.forEach(x=>{
+    const g=x[4]|0;
+    if(!wantG.has(g)) return;
+    if(filterTaal && g!==8 && isDutchCard({ar:x[1],ti:x[2]})) return;
+    const sk=songKey({ar:x[1],ti:x[2]});
+    if(seen.has(sk)) return;
+    seen.add(sk);
+    n++;
+  });
+  return n;
+}
 // trekkans per lijst: alleen de verhouding tussen de gewichten van de AANGEVINKTE lijsten telt
 function listShares(counts){
   const tot=LIST_SEL.reduce((s,on,g)=>s+((on&&counts[g])?GROUP_W[g]:0),0)||1;
@@ -4582,7 +4635,7 @@ function buildLists(){
   rb.type='button';
   rb.onclick=()=>{ GROUP_W=GROUP_W_DEF.slice(); saveWeights(); buildLists(); };
   lp.appendChild(rb);
-  const gekozen=LIST_SEL.reduce((s,on,g)=>s+(on?counts[g]:0),0);
+  const gekozen=selectedTotal();
   if($('#lCount')) $('#lCount').textContent=`· ${t('nums',{n:numLoc(gekozen)})}`;
 }
 function selectedLists(){ const a=[]; LIST_SEL.forEach((on,g)=>{ if(on)a.push(g); }); return a.length?a:[0]; }
@@ -4727,24 +4780,28 @@ function buildTijdsdruk(){
   });
 }
 // kookwekker-engine: loopt alleen tijdens G.phase==='draw', stopt zodra een plek gekozen is
-let TD_TIMER=null, TD_START=0;
+let TD_TIMER=null, TD_START=0, TD_CARD_IX=null;
 function tdClear(){
   if(TD_TIMER){ cancelAnimationFrame(TD_TIMER); TD_TIMER=null; }
+  TD_CARD_IX=null;
   const r=$('#tdRing'); if(r) r.style.display='none';
   const b=$('#tdBadge'); if(b) b.style.display='none';
   const q=$('#qbadge'); if(q) q.style.display='';
 }
 function tdStart(){
   tdClear();
-  if(!TIJDSDRUK || !G || G.phase!=='draw') return;
+  if(!TIJDSDRUK || !G || G.phase!=='draw' || !G.card) return;
   TD_START=performance.now();
+  TD_CARD_IX=G.card.ix;
   const r=$('#tdRing'); if(r) r.style.display='block';
   const b=$('#tdBadge'); if(b) b.style.display='flex';
   const q=$('#qbadge'); if(q) q.style.display='none';
   tdTick();
 }
 function tdTick(){
-  if(!TIJDSDRUK || !G || G.phase!=='draw'){ tdClear(); return; }
+  // vangnet: als de actieve kaart ondertussen gewisseld is zonder tdClear() (bv. via een vergeten pad),
+  // stopt de klok zichzelf i.p.v. door te tellen voor een kaart waar hij niet meer bij hoort
+  if(!TIJDSDRUK || !G || G.phase!=='draw' || !G.card || G.card.ix!==TD_CARD_IX){ tdClear(); return; }
   const dur=TD_SEC*1000;
   const elapsed=performance.now()-TD_START;
   const left=Math.max(0, dur-elapsed);
@@ -4767,12 +4824,8 @@ function tdExpire(){
   drawNext();
 }
 function initKermisHooks(){
-  const statusEl=$('#status');
-  if(statusEl){ let last='';
-    new MutationObserver(function(){ const t=(statusEl.textContent||'').trim(); if(!t||t===last)return; last=t;
-      if(!kOn())return; if(/^Goed geplaatst/i.test(t))kCorrect(); else if(/^Mis\b/i.test(t))kWrong();
-    }).observe(statusEl,{childList:true,subtree:true,characterData:true});
-  }
+  // geluid bij goed/fout haakt rechtstreeks in op de uitkomst in reveal() (zie daar), niet op de
+  // getoonde statustekst -- die verschilt per taal en dekte "Fout jaartal." nooit correct af
   const sb=$('#startBtn'); if(sb) sb.addEventListener('click',function(){ if(kOn()) setTimeout(kStart,90); });
 }
 
@@ -5143,7 +5196,7 @@ const DE_NAMES=[
  'Yelda','Yvonne','Zacharias','Zita','Zoe'
 ];
 function usedNames(){
-  try{ return JSON.parse(localStorage.getItem('kweethet.names.v1')||'[]'); }catch(e){ return []; }
+  try{ const a=JSON.parse(localStorage.getItem('kweethet.names.v1')||'[]'); return Array.isArray(a)?a:[]; }catch(e){ return []; }
 }
 function rememberNames(names){
   try{
@@ -5181,7 +5234,7 @@ function attachSuggest(inp, menu){
     if(!list.length){ close(); return; }
     menu.innerHTML='';
     list.forEach((n,i)=>{
-      const b=el('div','nsug-item', n);
+      const b=el('div','nsug-item', esc(n));
       b.onmousedown=(e)=>{ e.preventDefault(); pick(n); };   // mousedown: vóór blur
       b.ontouchstart=(e)=>{ e.preventDefault(); pick(n); };  // mobiel: directe tik
       menu.appendChild(b);
@@ -5298,7 +5351,7 @@ function closeAllPickdrops(){
 }
 document.addEventListener('click', closeAllPickdrops);
 // bij het kruisen van de breakpoint (venster verslepen) de vier velden herbouwen
-let WAS_WIDE_SETUP=null;
+let WAS_WIDE_SETUP=isWideSetup();
 window.addEventListener('resize', ()=>{
   const nowWide=isWideSetup();
   if(nowWide===WAS_WIDE_SETUP) return;
