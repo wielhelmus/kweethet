@@ -4220,7 +4220,7 @@ function tagStarts(){G.players.forEach(p=>{if(p.tl[0])p.tl[0].__start=true;});}
 let NPLAYERS=2;
 const NAMES=['Speler 1','Speler 2','Speler 3','Speler 4','Speler 5','Speler 6'];
 /* ===== meertaligheid (NL/EN/DE) ===== */
-const APP_VERSION='KweetHet.07-08-26e';   // versienummer: KweetHet.<dd-mm-jj>
+const APP_VERSION='KweetHet.07-08-26f';   // versienummer: KweetHet.<dd-mm-jj>
 let LANG = (()=>{ try{ const l=localStorage.getItem('kweethet.lang.v1'); return (l==='en'||l==='de'||l==='nl')?l:'nl'; }catch(e){ return 'nl'; } })();
 const TR={
  nl:{
@@ -4261,7 +4261,7 @@ const TR={
   clipK:'Kort',clipN:'Normaal',clipL:'Lang', clipKs:'± 15 sec',clipNs:'± 30 sec',clipLs:'± 60 sec',
   winKs:'{n} kaarten', wK:'Kort',wN:'Normaal',wL:'Lang',
   thStd:'Standaard',thStds:'rustig', thKer:'Kermis',thKers:'feest & geluid',
-  tdOff:'Uit',tdOffs:'geen tijdslimiet', tdOn:'Aan',tdOns:'35 sec. per beurt',
+  tdOff:'Uit',tdOffs:'geen tijdslimiet', td35:'35 sec',td35s:'per beurt', td60:'60 sec',td60s:'per beurt',
   timeUp:'{name}s kaart is weg — de tijd was om.',
   hdrDeck:'stapel', hdrPlayed:'gespeeld', hdrTurn:'Beurt:', qrOff:'QR uit',qrOn:'QR aan', newGame:'Nieuw spel',
   npNow:'Nu spelen — {name}', npHint:'Tik op <b style="color:var(--brand)">▶ {play}</b> of scan de QR met je telefoon, en tik daarna op een <b style="color:var(--brand)">▼ {place}</b>-vak (oudste links).',
@@ -4342,7 +4342,7 @@ const TR={
   clipK:'Short',clipN:'Normal',clipL:'Long', clipKs:'± 15 sec',clipNs:'± 30 sec',clipLs:'± 60 sec',
   winKs:'{n} cards', wK:'Short',wN:'Normal',wL:'Long',
   thStd:'Standard',thStds:'calm', thKer:'Funfair',thKers:'party & sound',
-  tdOff:'Off',tdOffs:'no time limit', tdOn:'On',tdOns:'35 sec. per turn',
+  tdOff:'Off',tdOffs:'no time limit', td35:'35 sec',td35s:'per turn', td60:'60 sec',td60s:'per turn',
   timeUp:'{name}\'s card is gone — time ran out.',
   hdrDeck:'deck', hdrPlayed:'played', hdrTurn:'Turn:', qrOff:'QR off',qrOn:'QR on', newGame:'New game',
   npNow:'Now playing — {name}', npHint:'Tap <b style="color:var(--brand)">▶ {play}</b> or scan the QR with your phone, then tap a <b style="color:var(--brand)">▼ {place}</b> slot (oldest on the left).',
@@ -4423,7 +4423,7 @@ const TR={
   clipK:'Kurz',clipN:'Normal',clipL:'Lang', clipKs:'± 15 Sek',clipNs:'± 30 Sek',clipLs:'± 60 Sek',
   winKs:'{n} Karten', wK:'Kurz',wN:'Normal',wL:'Lang',
   thStd:'Standard',thStds:'ruhig', thKer:'Kirmes',thKers:'Party & Sound',
-  tdOff:'Aus',tdOffs:'kein Zeitlimit', tdOn:'An',tdOns:'35 Sek. pro Zug',
+  tdOff:'Aus',tdOffs:'kein Zeitlimit', td35:'35 Sek',td35s:'pro Zug', td60:'60 Sek',td60s:'pro Zug',
   timeUp:'{name}s Karte ist weg — die Zeit ist um.',
   hdrDeck:'Stapel', hdrPlayed:'gespielt', hdrTurn:'Zug:', qrOff:'QR aus',qrOn:'QR an', newGame:'Neues Spiel',
   npNow:'Jetzt dran — {name}', npHint:'Tippe auf <b style="color:var(--brand)">▶ {play}</b> oder scanne den QR mit deinem Handy, dann tippe auf ein <b style="color:var(--brand)">▼ {place}</b>-Feld (ältestes links).',
@@ -4698,30 +4698,35 @@ function buildTheme(){
   });
 }
 /* ===== Tijdsdruk: kookwekker van 35 sec. per beurt, uit te zetten ===== */
-let TIJDSDRUK = (()=>{ try{ return localStorage.getItem('kweethet.tijdsdruk.v1')==='1'; }catch(e){ return false; } })();
-function applyTijdsdruk(on){
-  TIJDSDRUK=!!on; try{localStorage.setItem('kweethet.tijdsdruk.v1',TIJDSDRUK?'1':'0');}catch(e){}
+let TD_SEC = (()=>{ try{
+  const v=parseInt(localStorage.getItem('kweethet.tdsec.v1'));
+  if([0,35,60].includes(v)) return v;
+  if(localStorage.getItem('kweethet.tijdsdruk.v1')==='1') return 35;   // migratie vanaf de oude aan/uit-instelling
+  return 0;
+}catch(e){ return 0; } })();
+let TIJDSDRUK = TD_SEC>0;
+function applyTijdsdruk(sec){
+  TD_SEC=sec; TIJDSDRUK=sec>0;
+  try{localStorage.setItem('kweethet.tdsec.v1',String(sec));}catch(e){}
   if(!TIJDSDRUK) tdClear();
 }
 function buildTijdsdruk(){
   const tp=$('#tijdsdrukPick'); if(!tp) return;
-  const opts=[['off',t('tdOff'),t('tdOffs')],['on',t('tdOn'),t('tdOns')]];
+  const opts=[[0,t('tdOff'),t('tdOffs')],[35,t('td35'),t('td35s')],[60,t('td60'),t('td60s')]];
   if(isWideSetup()){
-    buildPickDropdown(tp, opts.map(([val,naam,sub])=>({value:val,label:naam,sub})), TIJDSDRUK?'on':'off',
-      (v)=>{ applyTijdsdruk(v==='on'); buildTijdsdruk(); });
+    buildPickDropdown(tp, opts.map(([val,naam,sub])=>({value:String(val),label:naam,sub})), String(TD_SEC),
+      (v)=>{ applyTijdsdruk(Number(v)); buildTijdsdruk(); });
     return;
   }
   tp.className='seglen'; tp.innerHTML='';
   opts.forEach(([val,naam,sub])=>{
-    const active=((val==='on')===TIJDSDRUK);
-    const b=el('button',active?'on':'',`${naam}<small>${sub}</small>`);
-    b.onclick=()=>{ applyTijdsdruk(val==='on'); buildTijdsdruk(); };
+    const b=el('button',TD_SEC===val?'on':'',`${naam}<small>${sub}</small>`);
+    b.onclick=()=>{ applyTijdsdruk(val); buildTijdsdruk(); };
     tp.appendChild(b);
   });
 }
 // kookwekker-engine: loopt alleen tijdens G.phase==='draw', stopt zodra een plek gekozen is
 let TD_TIMER=null, TD_START=0;
-const TD_DUR=35000;
 function tdClear(){
   if(TD_TIMER){ cancelAnimationFrame(TD_TIMER); TD_TIMER=null; }
   const r=$('#tdRing'); if(r) r.style.display='none';
@@ -4739,9 +4744,10 @@ function tdStart(){
 }
 function tdTick(){
   if(!TIJDSDRUK || !G || G.phase!=='draw'){ tdClear(); return; }
+  const dur=TD_SEC*1000;
   const elapsed=performance.now()-TD_START;
-  const left=Math.max(0, TD_DUR-elapsed);
-  const frac=left/TD_DUR;
+  const left=Math.max(0, dur-elapsed);
+  const frac=left/dur;
   const laag=left<=10000;
   const kleur=laag?'#e63562':'#fbbf24';
   const fg=$('#tdRingFg'); if(fg){ fg.setAttribute('stroke-dashoffset', String(295.3*(1-frac))); fg.style.stroke=kleur; }
