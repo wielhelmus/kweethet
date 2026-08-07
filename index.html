@@ -158,9 +158,9 @@ h1,h2,h3,.num{font-family:"Bricolage Grotesque",Inter,sans-serif}
 }
 .disc.revealed .rev{display:block}
 .disc .rev .yy{font-family:"Bricolage Grotesque";font-weight:800;font-size:56px;line-height:1;
-  background:linear-gradient(150deg,#fff,var(--brand) 140%);-webkit-background-clip:text;background-clip:text;
-  -webkit-text-fill-color:transparent;filter:drop-shadow(0 2px 12px rgba(230,53,98,.4));animation:yrpulse .6s ease-out 1}
-@keyframes yrpulse{0%{filter:drop-shadow(0 0 0 rgba(230,53,98,0))}50%{filter:drop-shadow(0 2px 22px rgba(230,53,98,.7))}100%{filter:drop-shadow(0 2px 12px rgba(230,53,98,.4))}}
+  background:linear-gradient(150deg,#fff,var(--pcol,var(--brand)) 140%);-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;filter:drop-shadow(0 2px 12px var(--pcglow,rgba(230,53,98,.4)));animation:yrpulse .6s ease-out 1}
+@keyframes yrpulse{0%{filter:drop-shadow(0 0 0 rgba(230,53,98,0))}50%{filter:drop-shadow(0 2px 22px var(--pcglow,rgba(230,53,98,.7)))}100%{filter:drop-shadow(0 2px 12px var(--pcglow,rgba(230,53,98,.4)))}}
 @media (prefers-reduced-motion:reduce){.disc.revealed{animation:none}.disc .rev .yy{animation:none}}
 .stage .info{flex:1;min-width:0}
 .stage .info .lead{font-weight:700;font-size:15px;margin:0 0 3px}
@@ -3969,7 +3969,13 @@ function render(){
 
   // disc
   const disc=$('#disc');
-  if(G.phase==='reveal'&&G.reveal){disc.className='disc revealed';$('#revYr').textContent=G.reveal.y;}
+  if(G.phase==='reveal'&&G.reveal){
+    disc.className='disc revealed';$('#revYr').textContent=G.reveal.y;
+    // jaartal in de kleur van de speler die net gedraaid heeft
+    const pc=PCOL[G.cur+1]||'var(--brand)';
+    disc.style.setProperty('--pcol', pc);
+    disc.style.setProperty('--pcglow', rgba(pc,.5));
+  }
   else{
     const src=(SHOWQR&&G.card)?qrFor(G.card):'';
     const im=$('#qrImg'); im.src=src||'';
@@ -4198,7 +4204,7 @@ function tagStarts(){G.players.forEach(p=>{if(p.tl[0])p.tl[0].__start=true;});}
 let NPLAYERS=2;
 const NAMES=['Speler 1','Speler 2','Speler 3','Speler 4','Speler 5','Speler 6'];
 /* ===== meertaligheid (NL/EN/DE) ===== */
-const APP_VERSION='KweetHet.07-08-26a';   // versienummer: KweetHet.<dd-mm-jj>
+const APP_VERSION='KweetHet.07-08-26b';   // versienummer: KweetHet.<dd-mm-jj>
 let LANG = (()=>{ try{ const l=localStorage.getItem('kweethet.lang.v1'); return (l==='en'||l==='de'||l==='nl')?l:'nl'; }catch(e){ return 'nl'; } })();
 const TR={
  nl:{
