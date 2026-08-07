@@ -2,7 +2,7 @@
 
 *[English version below](#knowit)*
 
-Een muziekspel voor het scherm van je telefoon of tv: de app speelt een
+Een muziekspel voor het scherm van je pc, laptop, telefoon of tv: de app speelt een
 nummer, jij raadt in welk jaar het uitkwam en legt de kaart op de juiste
 plek in je tijdlijn. Wie als eerste het ingestelde aantal kaarten heeft,
 wint. Voor 2 tot 6 spelers, op één apparaat.
@@ -39,7 +39,7 @@ Zie [LICENSE.md](LICENSE.md).
 
 *Nederlandse versie hierboven.*
 
-A music quiz for your phone or TV screen: the app plays a song, you guess
+A music quiz for your PC, laptop, phone or TV screen: the app plays a song, you guess
 the year it came out and place the card in the right spot on your
 timeline. First to reach the target number of cards wins. For 2 to 6
 players, one device.
