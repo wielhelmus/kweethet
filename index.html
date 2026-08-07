@@ -482,8 +482,8 @@ details.rules{margin-top:16px;margin-bottom:22px}
   margin-top:12px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg2);
   font-size:13px;color:var(--muted)}
 .histbox b{color:var(--ink)}
-.pcount{display:flex;gap:8px;flex-wrap:wrap}
-.pcount button{flex:1;min-width:52px;min-height:48px;border:1px solid var(--line);background:var(--bg2);
+.pcount{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pcount button{min-height:48px;border:1px solid var(--line);background:var(--bg2);
   color:var(--ink);font:800 17px "Bricolage Grotesque",Inter,sans-serif;border-radius:12px;cursor:pointer;transition:.12s}
 .pcount button:hover{border-color:var(--brand)}
 .pcount button.on{background:var(--brand);border-color:transparent;color:#fff}
@@ -4246,7 +4246,7 @@ function tagStarts(){G.players.forEach(p=>{if(p.tl[0])p.tl[0].__start=true;});}
 let NPLAYERS=2;
 const NAMES=['Speler 1','Speler 2','Speler 3','Speler 4','Speler 5','Speler 6'];
 /* ===== meertaligheid (NL/EN/DE) ===== */
-const APP_VERSION='KweetHet.07-08-26k';   // versienummer: KweetHet.<dd-mm-jj>
+const APP_VERSION='KweetHet.07-08-26l';   // versienummer: KweetHet.<dd-mm-jj>
 let LANG = (()=>{ try{ const l=localStorage.getItem('kweethet.lang.v1'); return (l==='en'||l==='de'||l==='nl')?l:'nl'; }catch(e){ return 'nl'; } })();
 const TR={
  nl:{
