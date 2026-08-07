@@ -1,6 +1,6 @@
 # KweetHet
 
-*[English version below](#knowit)*
+*[English version below](#knowit) · [Deutsche Version weiter unten](#deutsch)*
 
 Een muziekspel voor het scherm van je pc, laptop, telefoon of tv: de app speelt een
 nummer, jij raadt in welk jaar het uitkwam en legt de kaart op de juiste
@@ -37,7 +37,7 @@ Zie [LICENSE.md](LICENSE.md).
 
 ## KnowIt
 
-*Nederlandse versie hierboven.*
+*Nederlandse versie hierboven · [Deutsche Version weiter unten](#deutsch)*
 
 A music quiz for your PC, laptop, phone or TV screen: the app plays a song, you guess
 the year it came out and place the card in the right spot on your
@@ -69,6 +69,43 @@ any simple static file server.
 ### License
 
 See [LICENSE.md](LICENSE.md).
+
+---
+
+## Deutsch
+
+*Niederländische und englische Version weiter oben.*
+
+Ein Musikquiz für den Bildschirm deines PCs, Laptops, Handys oder Fernsehers:
+Die App spielt einen Song, du rätst das Erscheinungsjahr und legst die Karte
+an die richtige Stelle auf deiner Zeitleiste. Wer zuerst die eingestellte
+Anzahl Karten erreicht, gewinnt. Für 2 bis 6 Spieler, ein Gerät.
+
+**Hier spielen:** https://wielhelmus.github.io/kweethet/
+
+### Was es ist
+
+- Funktioniert offline, sogar auf einem alten Handy ohne Empfang
+- Niederländisch, Englisch und Deutsch (**KweetHet** / **KnowIt** / **WeißIch**)
+- Als App auf dem Startbildschirm installierbar (Android, iOS, Desktop)
+- Über 20.000 Songs, verteilt auf neun Spiellisten — von Top-2000-Klassikern
+  bis Eurovision bis ausschließlich niederländischsprachigen Titeln
+- Frei einstellbar: Anzahl Spieler, Clip-Länge, benötigte Karten zum Gewinnen,
+  und die Ziehchance pro Liste
+
+### Wie es funktioniert
+
+Kein Build-Schritt, kein Server. `index.html` ist die gesamte App — HTML,
+CSS, JavaScript und die Kartendaten in einer Datei. Ein Service Worker
+(`sw.js`) sorgt dafür, dass alles auch offline funktioniert; nur das
+Abspielen von Musik (über iTunes/Deezer) braucht eine Verbindung.
+
+Lokal ausführen: einfach `index.html` in einem Browser öffnen, oder mit
+einem beliebigen einfachen statischen Server bereitstellen.
+
+### Lizenz
+
+Siehe [LICENSE.md](LICENSE.md).
 
 ---
 

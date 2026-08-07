@@ -123,3 +123,64 @@ liable for any damages arising from its use.
 
 Want to do something that is not permitted above? Just ask. Contact the rights
 holder through wherever you found this project.
+
+---
+
+## Deutsch
+
+### Warum dieser Hinweis besteht
+
+Diese Website ist ein Browserspiel. Damit es funktioniert, muss der Browser
+den Code herunterladen und ausführen, wodurch dieser Code für jeden Besucher
+lesbar ist. Das ist eine technische Notwendigkeit, keine Einladung. Diese
+Lizenz legt fest, was damit erlaubt ist und was nicht.
+
+### Was nicht erlaubt ist
+
+Ohne vorherige schriftliche Zustimmung des Rechteinhabers ist es nicht
+gestattet:
+
+1. Den Quellcode dieses Spiels ganz oder teilweise zu kopieren, in einem
+   eigenen Projekt wiederzuverwenden, zu verbreiten oder zu veröffentlichen.
+2. Die zusammengestellte Songliste — die Auswahl, die Einteilung in
+   Spiellisten, die korrigierten Jahreszahlen und die Kontrolle der
+   verfügbaren Fragmente — ganz oder in wesentlichen Teilen zu übernehmen,
+   abzufragen oder wiederzuverwenden.
+3. Dieses Spiel oder eine Abwandlung davon kommerziell zu nutzen.
+4. Die Urheberangabe oder diese Lizenz zu entfernen oder zu ändern.
+
+### Was erlaubt ist
+
+- Das Spiel spielen, so oft du willst, auch mit Freunden und Familie.
+- Den Link mit anderen teilen.
+- Den Code ansehen und daraus lernen.
+- Fehler oder Verbesserungen melden.
+
+### Über die Songdaten
+
+Titel, Künstlernamen und Jahreszahlen sind Fakten und gehören als solche
+niemandem. Der in dieser Lizenz erhobene Anspruch betrifft die
+**Zusammenstellung**: die Auswahl, Ordnung, Korrektur und Überprüfung der
+Sammlung, in die erhebliche Arbeit geflossen ist. Innerhalb der Europäischen
+Union kann eine solche Datenbank zudem eigenständigen Schutz genießen.
+
+Die Musikfragmente selbst sind nicht Teil dieses Spiels. Sie werden während
+des Spielens bei öffentlichen Diensten Dritter (Apple und Deezer) abgerufen
+und bleiben Eigentum der jeweiligen Rechteinhaber. Dieses Spiel speichert
+keine Musik und verbreitet sie nicht.
+
+### Bestandteile Dritter
+
+Dieses Spiel enthält eine QR-Code-Bibliothek von Kazuhiko Arase, verwendet
+unter der MIT-Lizenz. Diese Lizenzbedingungen gelten uneingeschränkt für
+diesen Bestandteil weiter.
+
+### Keine Gewährleistung
+
+Dieses Spiel wird bereitgestellt, wie es ist, ohne jegliche Gewährleistung.
+Der Urheber haftet nicht für Schäden, die aus der Nutzung entstehen.
+
+### Um Erlaubnis fragen
+
+Möchtest du etwas tun, das oben nicht erlaubt ist? Frag einfach. Wende dich
+an den Rechteinhaber über die Stelle, wo du dieses Projekt gefunden hast.
