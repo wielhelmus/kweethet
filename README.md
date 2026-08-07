@@ -5,7 +5,7 @@
 Een muziekspel voor het scherm van je pc, laptop, telefoon of tv: de app speelt een
 nummer, jij raadt in welk jaar het uitkwam en legt de kaart op de juiste
 plek in je tijdlijn. Wie als eerste het ingestelde aantal kaarten heeft,
-wint. Voor 2 tot 6 spelers, op één apparaat.
+wint. Voor 2 tot 10 spelers, op één apparaat.
 
 **Speel het hier:** https://wielhelmus.github.io/kweethet/
 
@@ -41,7 +41,7 @@ Zie [LICENSE.md](LICENSE.md).
 
 A music quiz for your PC, laptop, phone or TV screen: the app plays a song, you guess
 the year it came out and place the card in the right spot on your
-timeline. First to reach the target number of cards wins. For 2 to 6
+timeline. First to reach the target number of cards wins. For 2 to 10
 players, one device.
 
 **Play it here:** https://wielhelmus.github.io/kweethet/
@@ -79,7 +79,7 @@ See [LICENSE.md](LICENSE.md).
 Ein Musikquiz für den Bildschirm deines PCs, Laptops, Handys oder Fernsehers:
 Die App spielt einen Song, du rätst das Erscheinungsjahr und legst die Karte
 an die richtige Stelle auf deiner Zeitleiste. Wer zuerst die eingestellte
-Anzahl Karten erreicht, gewinnt. Für 2 bis 6 Spieler, ein Gerät.
+Anzahl Karten erreicht, gewinnt. Für 2 bis 10 Spieler, ein Gerät.
 
 **Hier spielen:** https://wielhelmus.github.io/kweethet/
 

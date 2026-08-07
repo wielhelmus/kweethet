@@ -1,7 +1,7 @@
 {
   "name": "KweetHet",
   "short_name": "KweetHet",
-  "description": "Raad het releasejaar en bouw je tijdlijn — muziekspel voor 2 tot 6 spelers.",
+  "description": "Raad het releasejaar en bouw je tijdlijn — muziekspel voor 2 tot 10 spelers.",
   "id": "./",
   "start_url": "./index.html",
   "scope": "./",

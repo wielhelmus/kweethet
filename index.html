@@ -3310,7 +3310,7 @@ function qrFor(card){
 
 let WIN = (()=>{ try{ const v=parseInt(localStorage.getItem('kweethet.win.v1')); return [7,10,15].includes(v)?v:10; }catch(e){ return 10; } })();
 const TOKMAX=5;
-const PCOL={1:'#e63562',2:'#37d3c3',3:'#a78bfa',4:'#a3e635',5:'#fb923c',6:'#38bdf8'};
+const PCOL={1:'#e63562',2:'#37d3c3',3:'#a78bfa',4:'#a3e635',5:'#fb923c',6:'#38bdf8',7:'#f472b6',8:'#f6c445',9:'#10b981',10:'#818cf8'};
 // speler 1 is ook de merkkleur (--brand/--p1); in het kermis-thema is dat roze in plaats van het gewone rood
 function syncKermisPCOL(){ PCOL[1]=(typeof KERMIS!=='undefined'&&KERMIS)?'#ff2d6e':'#e63562'; }
 // kies zwarte of witte tekst afhankelijk van hoe licht de kleur is (leesbaarheid)
@@ -3332,7 +3332,7 @@ const ICON={
   chevDown:'<svg class="chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>',
   check:'<svg class="check" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>',
 };
-const MAXP=6, MINP=2;
+const MAXP=10, MINP=2;
 function rgba(hex,a){const h=hex.replace('#','');const n=parseInt(h,16);
   return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;}
 let G=null;
@@ -4246,7 +4246,7 @@ function tagStarts(){G.players.forEach(p=>{if(p.tl[0])p.tl[0].__start=true;});}
 let NPLAYERS=2;
 const NAMES=['Speler 1','Speler 2','Speler 3','Speler 4','Speler 5','Speler 6'];
 /* ===== meertaligheid (NL/EN/DE) ===== */
-const APP_VERSION='KweetHet.07-08-26j';   // versienummer: KweetHet.<dd-mm-jj>
+const APP_VERSION='KweetHet.07-08-26k';   // versienummer: KweetHet.<dd-mm-jj>
 let LANG = (()=>{ try{ const l=localStorage.getItem('kweethet.lang.v1'); return (l==='en'||l==='de'||l==='nl')?l:'nl'; }catch(e){ return 'nl'; } })();
 const TR={
  nl:{
@@ -4282,7 +4282,7 @@ const TR={
   s_played:'Al gespeeld: <b id="histN">{n}</b> nummers. Die komen niet terug.',
   s_intro:'<b>{word} spelers</b> bouwen elk een tijdlijn van nummers. De app is de DJ: hij speelt een nummer af, jij raadt wanneer het uitkwam en legt de kaart op de juiste plek. {clock}De eerste speler met <b>{win} kaarten</b> wint.',
   clockNL:'De beurt gaat met de klok mee. ',
-  w2:'Twee',w3:'Drie',w4:'Vier',w5:'Vijf',w6:'Zes',
+  w2:'Twee',w3:'Drie',w4:'Vier',w5:'Vijf',w6:'Zes',w7:'Zeven',w8:'Acht',w9:'Negen',w10:'Tien',
   player:'Speler', nums:'{n} nummers', listPfx:'Lijst {n} — ',
   clipK:'Kort',clipN:'Normaal',clipL:'Lang', clipKs:'± 15 sec',clipNs:'± 30 sec',clipLs:'± 60 sec',
   winKs:'{n} kaarten', wK:'Kort',wN:'Normaal',wL:'Lang',
@@ -4363,7 +4363,7 @@ const TR={
   s_played:'Already played: <b id="histN">{n}</b> songs. They won\u2019t come back.',
   s_intro:'<b>{word} players</b> each build a timeline of songs. The app is the DJ: it plays a song, you guess when it came out and place the card in the right spot. {clock}The first player with <b>{win} cards</b> wins.',
   clockNL:'Turns go clockwise. ',
-  w2:'Two',w3:'Three',w4:'Four',w5:'Five',w6:'Six',
+  w2:'Two',w3:'Three',w4:'Four',w5:'Five',w6:'Six',w7:'Seven',w8:'Eight',w9:'Nine',w10:'Ten',
   player:'Player', nums:'{n} songs', listPfx:'List {n} — ',
   clipK:'Short',clipN:'Normal',clipL:'Long', clipKs:'± 15 sec',clipNs:'± 30 sec',clipLs:'± 60 sec',
   winKs:'{n} cards', wK:'Short',wN:'Normal',wL:'Long',
@@ -4444,7 +4444,7 @@ const TR={
   s_played:'Schon gespielt: <b id="histN">{n}</b> Songs. Die kommen nicht zurück.',
   s_intro:'<b>{word} Spieler</b> bauen je eine Zeitleiste aus Songs. Die App ist der DJ: sie spielt einen Song, du rätst, wann er erschien, und legst die Karte an die richtige Stelle. {clock}Der erste Spieler mit <b>{win} Karten</b> gewinnt.',
   clockNL:'Es geht im Uhrzeigersinn. ',
-  w2:'Zwei',w3:'Drei',w4:'Vier',w5:'Fünf',w6:'Sechs',
+  w2:'Zwei',w3:'Drei',w4:'Vier',w5:'Fünf',w6:'Sechs',w7:'Sieben',w8:'Acht',w9:'Neun',w10:'Zehn',
   player:'Spieler', nums:'{n} Songs', listPfx:'Liste {n} — ',
   clipK:'Kurz',clipN:'Normal',clipL:'Lang', clipKs:'± 15 Sek',clipNs:'± 30 Sek',clipLs:'± 60 Sek',
   winKs:'{n} Karten', wK:'Kurz',wN:'Normal',wL:'Lang',
