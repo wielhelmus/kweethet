@@ -1,3 +1,4 @@
+<!-- Gebruiksvoorwaarden van de app; wordt onderin KweetHet vanuit de app gelinkt. -->
 # LICENTIE / LICENSE
 
 **KweetHet** — een muziekspel waarin spelers het releasejaar van nummers raden.
