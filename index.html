@@ -4198,7 +4198,7 @@ function tagStarts(){G.players.forEach(p=>{if(p.tl[0])p.tl[0].__start=true;});}
 let NPLAYERS=2;
 const NAMES=['Speler 1','Speler 2','Speler 3','Speler 4','Speler 5','Speler 6'];
 /* ===== meertaligheid (NL/EN/DE) ===== */
-const APP_VERSION='KweetHet.06-08-26i';   // versienummer: KweetHet.<dd-mm-jj>
+const APP_VERSION='KweetHet.07-08-26';   // versienummer: KweetHet.<dd-mm-jj>
 let LANG = (()=>{ try{ const l=localStorage.getItem('kweethet.lang.v1'); return (l==='en'||l==='de'||l==='nl')?l:'nl'; }catch(e){ return 'nl'; } })();
 const TR={
  nl:{
@@ -4232,7 +4232,7 @@ const TR={
   s_colWho:'Wie speelt er', s_colHow:'Hoe wordt het potje',
   s_score:'📊 Scorebord bekijken', s_rules:'Spelregels & tokens', s_clearHist:'Wis geschiedenis',
   s_played:'Al gespeeld: <b id="histN">{n}</b> nummers. Die komen niet terug.',
-  s_intro:'<b>{word} spelers</b> bouwen elk een tijdlijn van nummers. De app is de DJ: hij speelt een nummer af, jij raadt wanneer het uitkwam en legt de kaart op de juiste plek. {clock}Eerste met <b>{win} kaarten</b> wint.',
+  s_intro:'<b>{word} spelers</b> bouwen elk een tijdlijn van nummers. De app is de DJ: hij speelt een nummer af, jij raadt wanneer het uitkwam en legt de kaart op de juiste plek. {clock}De eerste speler met <b>{win} kaarten</b> wint.',
   clockNL:'De beurt gaat met de klok mee. ',
   w2:'Twee',w3:'Drie',w4:'Vier',w5:'Vijf',w6:'Zes',
   player:'Speler', nums:'{n} nummers', listPfx:'Lijst {n} — ',
@@ -4310,7 +4310,7 @@ const TR={
   s_colWho:'Who\'s playing', s_colHow:'Game settings',
   s_score:'📊 View scoreboard', s_rules:'Rules & tokens', s_clearHist:'Clear history',
   s_played:'Already played: <b id="histN">{n}</b> songs. They won\u2019t come back.',
-  s_intro:'<b>{word} players</b> each build a timeline of songs. The app is the DJ: it plays a song, you guess when it came out and place the card in the right spot. {clock}First to <b>{win} cards</b> wins.',
+  s_intro:'<b>{word} players</b> each build a timeline of songs. The app is the DJ: it plays a song, you guess when it came out and place the card in the right spot. {clock}The first player with <b>{win} cards</b> wins.',
   clockNL:'Turns go clockwise. ',
   w2:'Two',w3:'Three',w4:'Four',w5:'Five',w6:'Six',
   player:'Player', nums:'{n} songs', listPfx:'List {n} — ',
@@ -4388,7 +4388,7 @@ const TR={
   s_colWho:'Wer spielt mit', s_colHow:'Spieleinstellungen',
   s_score:'📊 Bestenliste ansehen', s_rules:'Regeln & Tokens', s_clearHist:'Verlauf löschen',
   s_played:'Schon gespielt: <b id="histN">{n}</b> Songs. Die kommen nicht zurück.',
-  s_intro:'<b>{word} Spieler</b> bauen je eine Zeitleiste aus Songs. Die App ist der DJ: sie spielt einen Song, du rätst, wann er erschien, und legst die Karte an die richtige Stelle. {clock}Wer zuerst <b>{win} Karten</b> hat, gewinnt.',
+  s_intro:'<b>{word} Spieler</b> bauen je eine Zeitleiste aus Songs. Die App ist der DJ: sie spielt einen Song, du rätst, wann er erschien, und legst die Karte an die richtige Stelle. {clock}Der erste Spieler mit <b>{win} Karten</b> gewinnt.',
   clockNL:'Es geht im Uhrzeigersinn. ',
   w2:'Zwei',w3:'Drei',w4:'Vier',w5:'Fünf',w6:'Sechs',
   player:'Spieler', nums:'{n} Songs', listPfx:'Liste {n} — ',
