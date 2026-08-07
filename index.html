@@ -149,6 +149,10 @@ h1,h2,h3,.num{font-family:"Bricolage Grotesque",Inter,sans-serif}
   align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(0,0,0,.45);border:3px solid var(--bg2);z-index:2}
 .disc.mystery .qbadge{display:flex}
 .disc.mystery.noqr .qbadge{display:none}
+.disc .tdring{position:absolute;inset:0;z-index:3;pointer-events:none}
+.disc .tdbadge{position:absolute;top:-11px;right:-11px;width:40px;height:40px;border-radius:50%;
+  color:#fff;font-family:"Bricolage Grotesque";font-weight:800;font-size:18px;background:#fbbf24;
+  align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(0,0,0,.45);border:3px solid var(--bg2);z-index:4}
 .disc .rev{display:none;text-align:center;padding:6px}
 .disc.revealed{background:var(--surface2);animation:revealpop .5s cubic-bezier(.34,1.56,.64,1) 1}
 @keyframes revealpop{
@@ -831,7 +835,12 @@ body.kermis #winName{color:var(--kgold);text-shadow:0 2px 10px rgba(255,206,67,.
       <span class="platter" aria-hidden="true"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><circle cx="50" cy="50" r="49" fill="var(--pcol,var(--brand))"/><path d="M50 4 A46 46 0 0 1 96 50" fill="none" stroke="#fff" stroke-width="3.5" opacity="0.4"/></svg></span>
       <img class="qr" id="qrImg" alt="Scan om af te spelen">
       <span class="qvinyl" aria-hidden="true"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" fill="var(--pcol,var(--brand))"/><circle cx="50" cy="50" r="19" fill="#100e1c"/><text x="50" y="50" text-anchor="middle" dominant-baseline="central" font-family="Bricolage Grotesque,Inter,sans-serif" font-weight="800" font-size="26" fill="var(--pcol,var(--brand))">?</text><path d="M50 6 A44 44 0 0 1 94 50" fill="none" stroke="#fff" stroke-width="4" opacity="0.4"/></svg></span>
-      <span class="qbadge">?</span>
+      <span class="qbadge" id="qbadge">?</span>
+      <svg class="tdring" id="tdRing" viewBox="0 0 100 100" aria-hidden="true" style="display:none">
+        <circle cx="50" cy="50" r="47" fill="none" stroke="#000" stroke-opacity="0.25" stroke-width="4"/>
+        <circle cx="50" cy="50" r="47" fill="none" stroke="#fbbf24" stroke-width="4" stroke-linecap="round" stroke-dasharray="295.3" stroke-dashoffset="0" transform="rotate(-90 50 50)" id="tdRingFg"/>
+      </svg>
+      <span class="tdbadge" id="tdBadge" style="display:none"></span>
       <div class="rev"><div class="yy" id="revYr"></div></div>
     </div>
     <div class="info">
@@ -925,6 +934,10 @@ body.kermis #winName{color:var(--kgold);text-shadow:0 2px 10px rgba(255,206,67,.
         <div class="field">
           <label data-i18n="s_theme">Thema</label>
           <div class="seglen" id="themePick"></div>
+        </div>
+        <div class="field">
+          <label data-i18n="s_tijdsdruk">Tijdsdruk</label>
+          <div class="seglen" id="tijdsdrukPick"></div>
         </div>
       </div>
     </div>
@@ -3682,6 +3695,7 @@ async function playSong(){
     }
     return render();
   }
+  tdStart();
   playClip(0);
 }
 
@@ -3709,7 +3723,7 @@ function tradeCard(k){
   render();
 }
 
-function chooseSlot(i){ if(G.phase!=='draw')return; hideTurtle(); G.chosen=i; G.phase='placed';
+function chooseSlot(i){ if(G.phase!=='draw')return; hideTurtle(); tdClear(); G.chosen=i; G.phase='placed';
   G.msg=t('placed'); render(); }
 function unplace(){ if(G.phase!=='placed'||(G.challenges||[]).length)return; G.chosen=null; G.phase='draw';
   G.msg=t('cardBack'); render(); }
@@ -4012,9 +4026,10 @@ function render(){
       : G.chosen!=null ? t('npPlaced')
       : t('npHint',{play:t('play'),place:t('placeHere')});
     if(G.phase==='draw'||G.phase==='placed'){
+      const pauseLocked=TIJDSDRUK&&G.playing;   // bij tijdsdruk mag je niet pauzeren om tijd te rekken
       const lbl=G.loadingAudio?t('searching'):(G.playing?'⏸ '+t('pause'):'▶ '+t('play'));
-      const play=el('button','btn play'+(G.loadingAudio?' loading':''),lbl);
-      play.onclick=()=>{ if(G.loadingAudio)return; G.playing?pauseSong():playSong(); };
+      const play=el('button','btn play'+(G.loadingAudio?' loading':'')+(pauseLocked?' dim':''),lbl);
+      play.onclick=()=>{ if(G.loadingAudio||pauseLocked)return; G.playing?pauseSong():playSong(); };
       np.appendChild(play);
       const sk=el('button','btn'+(p.tokens<1?' dim':''),'⏭ '+t('skip'));sk.onclick=skipCard;np.appendChild(sk);
       if(G.audioFail==='none'&&G.chosen==null){ const ot=el('button','btn gold','▶ '+t('other'));ot.onclick=otherSong;np.appendChild(ot); }
@@ -4205,7 +4220,7 @@ function tagStarts(){G.players.forEach(p=>{if(p.tl[0])p.tl[0].__start=true;});}
 let NPLAYERS=2;
 const NAMES=['Speler 1','Speler 2','Speler 3','Speler 4','Speler 5','Speler 6'];
 /* ===== meertaligheid (NL/EN/DE) ===== */
-const APP_VERSION='KweetHet.07-08-26d';   // versienummer: KweetHet.<dd-mm-jj>
+const APP_VERSION='KweetHet.07-08-26e';   // versienummer: KweetHet.<dd-mm-jj>
 let LANG = (()=>{ try{ const l=localStorage.getItem('kweethet.lang.v1'); return (l==='en'||l==='de'||l==='nl')?l:'nl'; }catch(e){ return 'nl'; } })();
 const TR={
  nl:{
@@ -4235,7 +4250,7 @@ const TR={
   tradeTip:'Altijd mogelijk, ook als je niet aan de beurt bent. De beurt loopt gewoon door.',
 
   s_title:'Klaar om te spelen?', s_players:'Aantal spelers', s_lists:'Speellijsten', s_clip:'Fragmentlengte',
-  s_win:'Aantal kaarten om te winnen', s_theme:'Thema', s_lang:'Taal', s_start:'Start het spel',
+  s_win:'Aantal kaarten om te winnen', s_theme:'Thema', s_tijdsdruk:'Tijdsdruk', s_lang:'Taal', s_start:'Start het spel',
   s_colWho:'Wie speelt er', s_colHow:'Hoe wordt het potje',
   s_score:'📊 Scorebord bekijken', s_rules:'Spelregels & tokens', s_clearHist:'Wis geschiedenis',
   s_played:'Al gespeeld: <b id="histN">{n}</b> nummers. Die komen niet terug.',
@@ -4246,6 +4261,8 @@ const TR={
   clipK:'Kort',clipN:'Normaal',clipL:'Lang', clipKs:'± 15 sec',clipNs:'± 30 sec',clipLs:'± 60 sec',
   winKs:'{n} kaarten', wK:'Kort',wN:'Normaal',wL:'Lang',
   thStd:'Standaard',thStds:'rustig', thKer:'Kermis',thKers:'feest & geluid',
+  tdOff:'Uit',tdOffs:'geen tijdslimiet', tdOn:'Aan',tdOns:'35 sec. per beurt',
+  timeUp:'{name}s kaart is weg — de tijd was om.',
   hdrDeck:'stapel', hdrPlayed:'gespeeld', hdrTurn:'Beurt:', qrOff:'QR uit',qrOn:'QR aan', newGame:'Nieuw spel',
   npNow:'Nu spelen — {name}', npHint:'Tik op <b style="color:var(--brand)">▶ {play}</b> of scan de QR met je telefoon, en tik daarna op een <b style="color:var(--brand)">▼ {place}</b>-vak (oudste links).',
   npChal:'Uitdaging bezig…', npPlaced:'Kaart geplaatst. Draai om — of laat je tegenstander KweetHetBeter roepen.',
@@ -4314,7 +4331,7 @@ const TR={
   tradeTip:'Always possible, even when it is not your turn. The turn simply continues.',
 
   s_title:'Ready to play?', s_players:'Number of players', s_lists:'Playlists', s_clip:'Clip length',
-  s_win:'Cards needed to win', s_theme:'Theme', s_lang:'Language', s_start:'Start the game',
+  s_win:'Cards needed to win', s_theme:'Theme', s_tijdsdruk:'Time pressure', s_lang:'Language', s_start:'Start the game',
   s_colWho:'Who\'s playing', s_colHow:'Game settings',
   s_score:'📊 View scoreboard', s_rules:'Rules & tokens', s_clearHist:'Clear history',
   s_played:'Already played: <b id="histN">{n}</b> songs. They won\u2019t come back.',
@@ -4325,6 +4342,8 @@ const TR={
   clipK:'Short',clipN:'Normal',clipL:'Long', clipKs:'± 15 sec',clipNs:'± 30 sec',clipLs:'± 60 sec',
   winKs:'{n} cards', wK:'Short',wN:'Normal',wL:'Long',
   thStd:'Standard',thStds:'calm', thKer:'Funfair',thKers:'party & sound',
+  tdOff:'Off',tdOffs:'no time limit', tdOn:'On',tdOns:'35 sec. per turn',
+  timeUp:'{name}\'s card is gone — time ran out.',
   hdrDeck:'deck', hdrPlayed:'played', hdrTurn:'Turn:', qrOff:'QR off',qrOn:'QR on', newGame:'New game',
   npNow:'Now playing — {name}', npHint:'Tap <b style="color:var(--brand)">▶ {play}</b> or scan the QR with your phone, then tap a <b style="color:var(--brand)">▼ {place}</b> slot (oldest on the left).',
   npChal:'Challenge in progress…', npPlaced:'Card placed. Flip it over — or let your opponent call KnowItBetter.',
@@ -4393,7 +4412,7 @@ const TR={
   tradeTip:'Immer möglich, auch wenn du nicht am Zug bist. Der Zug läuft normal weiter.',
 
   s_title:'Bereit zu spielen?', s_players:'Anzahl Spieler', s_lists:'Wiedergabelisten', s_clip:'Clip-Länge',
-  s_win:'Karten zum Gewinnen', s_theme:'Thema', s_lang:'Sprache', s_start:'Spiel starten',
+  s_win:'Karten zum Gewinnen', s_theme:'Thema', s_tijdsdruk:'Zeitdruck', s_lang:'Sprache', s_start:'Spiel starten',
   s_colWho:'Wer spielt mit', s_colHow:'Spieleinstellungen',
   s_score:'📊 Bestenliste ansehen', s_rules:'Regeln & Tokens', s_clearHist:'Verlauf löschen',
   s_played:'Schon gespielt: <b id="histN">{n}</b> Songs. Die kommen nicht zurück.',
@@ -4404,6 +4423,8 @@ const TR={
   clipK:'Kurz',clipN:'Normal',clipL:'Lang', clipKs:'± 15 Sek',clipNs:'± 30 Sek',clipLs:'± 60 Sek',
   winKs:'{n} Karten', wK:'Kurz',wN:'Normal',wL:'Lang',
   thStd:'Standard',thStds:'ruhig', thKer:'Kirmes',thKers:'Party & Sound',
+  tdOff:'Aus',tdOffs:'kein Zeitlimit', tdOn:'An',tdOns:'35 Sek. pro Zug',
+  timeUp:'{name}s Karte ist weg — die Zeit ist um.',
   hdrDeck:'Stapel', hdrPlayed:'gespielt', hdrTurn:'Zug:', qrOff:'QR aus',qrOn:'QR an', newGame:'Neues Spiel',
   npNow:'Jetzt dran — {name}', npHint:'Tippe auf <b style="color:var(--brand)">▶ {play}</b> oder scanne den QR mit deinem Handy, dann tippe auf ein <b style="color:var(--brand)">▼ {place}</b>-Feld (ältestes links).',
   npChal:'Herausforderung läuft…', npPlaced:'Karte gelegt. Umdrehen — oder lass deinen Gegner WeißIchBesser rufen.',
@@ -4676,6 +4697,68 @@ function buildTheme(){
     tp.appendChild(b);
   });
 }
+/* ===== Tijdsdruk: kookwekker van 35 sec. per beurt, uit te zetten ===== */
+let TIJDSDRUK = (()=>{ try{ return localStorage.getItem('kweethet.tijdsdruk.v1')==='1'; }catch(e){ return false; } })();
+function applyTijdsdruk(on){
+  TIJDSDRUK=!!on; try{localStorage.setItem('kweethet.tijdsdruk.v1',TIJDSDRUK?'1':'0');}catch(e){}
+  if(!TIJDSDRUK) tdClear();
+}
+function buildTijdsdruk(){
+  const tp=$('#tijdsdrukPick'); if(!tp) return;
+  const opts=[['off',t('tdOff'),t('tdOffs')],['on',t('tdOn'),t('tdOns')]];
+  if(isWideSetup()){
+    buildPickDropdown(tp, opts.map(([val,naam,sub])=>({value:val,label:naam,sub})), TIJDSDRUK?'on':'off',
+      (v)=>{ applyTijdsdruk(v==='on'); buildTijdsdruk(); });
+    return;
+  }
+  tp.className='seglen'; tp.innerHTML='';
+  opts.forEach(([val,naam,sub])=>{
+    const active=((val==='on')===TIJDSDRUK);
+    const b=el('button',active?'on':'',`${naam}<small>${sub}</small>`);
+    b.onclick=()=>{ applyTijdsdruk(val==='on'); buildTijdsdruk(); };
+    tp.appendChild(b);
+  });
+}
+// kookwekker-engine: loopt alleen tijdens G.phase==='draw', stopt zodra een plek gekozen is
+let TD_TIMER=null, TD_START=0;
+const TD_DUR=35000;
+function tdClear(){
+  if(TD_TIMER){ cancelAnimationFrame(TD_TIMER); TD_TIMER=null; }
+  const r=$('#tdRing'); if(r) r.style.display='none';
+  const b=$('#tdBadge'); if(b) b.style.display='none';
+  const q=$('#qbadge'); if(q) q.style.display='';
+}
+function tdStart(){
+  tdClear();
+  if(!TIJDSDRUK || !G || G.phase!=='draw') return;
+  TD_START=performance.now();
+  const r=$('#tdRing'); if(r) r.style.display='block';
+  const b=$('#tdBadge'); if(b) b.style.display='flex';
+  const q=$('#qbadge'); if(q) q.style.display='none';
+  tdTick();
+}
+function tdTick(){
+  if(!TIJDSDRUK || !G || G.phase!=='draw'){ tdClear(); return; }
+  const elapsed=performance.now()-TD_START;
+  const left=Math.max(0, TD_DUR-elapsed);
+  const frac=left/TD_DUR;
+  const laag=left<=10000;
+  const kleur=laag?'#e63562':'#fbbf24';
+  const fg=$('#tdRingFg'); if(fg){ fg.setAttribute('stroke-dashoffset', String(295.3*(1-frac))); fg.style.stroke=kleur; }
+  const badge=$('#tdBadge'); if(badge){ badge.textContent=String(Math.ceil(left/1000)); badge.style.background=kleur; }
+  if(left<=0){ tdExpire(); return; }
+  TD_TIMER=requestAnimationFrame(tdTick);
+}
+function tdExpire(){
+  tdClear();
+  if(!G || G.phase!=='draw') return;
+  stopAudio();
+  const p=G.players[G.cur];
+  G.discard.push(G.card);
+  G.cur=(G.cur+1)%G.players.length;   // beurt voorbij: naar de volgende speler, geen nieuwe kaart voor dezelfde
+  G.msg=t('timeUp',{name:p.name});
+  drawNext();
+}
 function initKermisHooks(){
   const statusEl=$('#status');
   if(statusEl){ let last='';
@@ -4709,7 +4792,7 @@ const TURTLE_SVG=`<svg width="260" height="93" viewBox="0 0 420 150" xmlns="http
 <g class="dl-leg dl-legB"><rect x="352" y="98" width="16" height="28" rx="8" fill="#4faf74"/></g>
 </svg>`;
 let turtleTimer=null;
-function armTurtle(){ clearTimeout(turtleTimer); turtleTimer=setTimeout(function(){
+function armTurtle(){ if(TIJDSDRUK)return; clearTimeout(turtleTimer); turtleTimer=setTimeout(function(){
   if(typeof G!=='undefined'&&G&&G.phase==='draw'&&G.chosen==null) showTurtle();
 },30000); }
 function hideTurtle(){ clearTimeout(turtleTimer); turtleTimer=null; var t=document.getElementById('duurtlang'); if(t)t.remove(); }
@@ -5217,6 +5300,7 @@ window.addEventListener('resize', ()=>{
   if(typeof buildClipLen==='function') buildClipLen();
   if(typeof buildWinLen==='function') buildWinLen();
   if(typeof buildTheme==='function') buildTheme();
+  if(typeof buildTijdsdruk==='function') buildTijdsdruk();
 });
 function buildSetup(){
   renderInstallChip();
@@ -5246,6 +5330,7 @@ function buildSetup(){
   buildClipLen();
   buildWinLen();
   buildTheme();
+  buildTijdsdruk();
 }
 function saveNames(){ for(let k=0;k<MAXP;k++){ const i=$('#n'+(k+1)); if(i)NAMES[k]=i.value.trim()||defName(k); } }
 function readNames(){ const out=[]; for(let k=0;k<NPLAYERS;k++){ const i=$('#n'+(k+1)); out.push(i? (i.value.trim()||defName(k)) : ''); } return out; }
@@ -5320,7 +5405,7 @@ document.addEventListener('keydown',(e)=>{
   if(typeof G==='undefined'||!G||!G.players) return;
   if($('#setup').style.display!=='none' && $('#setup').style.display!=='') return;
   if(e.code==='Space'){                      // afspelen / pauze
-    if(G.phase==='draw'||G.phase==='placed'){ e.preventDefault(); if(!G.loadingAudio){ G.playing?pauseSong():playSong(); } }
+    if(G.phase==='draw'||G.phase==='placed'){ e.preventDefault(); if(!G.loadingAudio && !(TIJDSDRUK&&G.playing)){ G.playing?pauseSong():playSong(); } }
   }else if(e.code==='ArrowRight'||e.code==='ArrowLeft'){   // actieve tijdlijn scrollen
     const tl=document.querySelector('.player.active .tl');
     if(tl){ e.preventDefault(); tl.scrollBy({left:(e.code==='ArrowRight'?1:-1)*160,behavior:'smooth'}); }
