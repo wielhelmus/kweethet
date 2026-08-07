@@ -893,13 +893,13 @@ body.kermis #winName{color:var(--kgold);text-shadow:0 2px 10px rgba(255,206,67,.
       <summary data-i18n="s_rules">Spelregels & tokens</summary>
       <ul>
         <li data-i18n="r1"><b>2 tot 6 spelers.</b> Iedereen start met <b>1 kaart</b> (jaartal zichtbaar) en <b>2 tokens</b>. De beurt gaat met de klok mee.</li>
-        <li data-i18n="r2">Op je beurt: speel het nummer, leg de kaart <b>links, rechts of tussen</b> je kaarten — oudste links.</li>
-        <li data-i18n="r3">Klopt de plek? Je houdt de kaart. Fout? Weg — tenzij je tegenstander KweetHetBeter riep en het wél goed had.</li>
+        <li data-i18n="r2">Op je beurt: speel het nummer, leg de kaart <b>links, rechts of tussen</b> je kaarten, oudste links.</li>
+        <li data-i18n="r3">Klopt de plek? Je houdt de kaart. Fout? Weg, tenzij je tegenstander KweetHetBeter riep en het wél goed had.</li>
         <li data-i18n="r4"><b>Token verdienen:</b> ken je titel én artiest, dan krijg je 1 token (ook als je de kaart fout legt). Max 5.</li>
         <li data-i18n="r5"><b>Ken je 't nummer niet?</b> Betaal 1 token en sla over voor een nieuwe kaart.</li>
-        <li data-i18n="r6"><b>KweetHetBeter roepen:</b> denk je dat de speler fout legt? Zet 1 token op de plek waar jij denkt dat 't hoort. Goed geraden = kaart gestolen. Meerdere spelers mogen roepen, maar niet twee tokens op dezelfde plek — wie het eerst riep én goed zit, wint.</li>
-        <li data-i18n="r7"><b>3 tokens ruilen:</b> altijd mogelijk, ook als je niet aan de beurt bent — pak de bovenste kaart, gratis goed op je tijdlijn. De beurt loopt gewoon door.</li>
-        <li data-i18n="r8"><b>Telefoons met het scherm naar beneden, graag.</b> Sommige telefoons tonen de naam van het nummer op het vergrendelscherm — dat verklapt het antwoord.</li>
+        <li data-i18n="r6"><b>KweetHetBeter roepen:</b> denk je dat de speler fout legt? Zet 1 token op de plek waar jij denkt dat 't hoort. Goed geraden = kaart gestolen. Meerdere spelers mogen roepen, maar niet twee tokens op dezelfde plek, wie het eerst riep én goed zit, wint.</li>
+        <li data-i18n="r7"><b>3 tokens ruilen:</b> altijd mogelijk, ook als je niet aan de beurt bent, pak de bovenste kaart, gratis goed op je tijdlijn. De beurt loopt gewoon door.</li>
+        <li data-i18n="r8"><b>Telefoons met het scherm naar beneden, graag.</b> Sommige telefoons tonen de naam van het nummer op het vergrendelscherm, dat verklapt het antwoord.</li>
       </ul>
     </details>
     <div class="setup-cols">
@@ -4220,7 +4220,7 @@ function tagStarts(){G.players.forEach(p=>{if(p.tl[0])p.tl[0].__start=true;});}
 let NPLAYERS=2;
 const NAMES=['Speler 1','Speler 2','Speler 3','Speler 4','Speler 5','Speler 6'];
 /* ===== meertaligheid (NL/EN/DE) ===== */
-const APP_VERSION='KweetHet.07-08-26f';   // versienummer: KweetHet.<dd-mm-jj>
+const APP_VERSION='KweetHet.07-08-26g';   // versienummer: KweetHet.<dd-mm-jj>
 let LANG = (()=>{ try{ const l=localStorage.getItem('kweethet.lang.v1'); return (l==='en'||l==='de'||l==='nl')?l:'nl'; }catch(e){ return 'nl'; } })();
 const TR={
  nl:{
@@ -4295,13 +4295,13 @@ const TR={
   noTokenChal:'{name} heeft geen token om KweetHetBeter te roepen.', searching:'⏳ Zoeken…',
   lastMove:'Laatste zet', tradeText:'Tokens voor winst. Lekker makkelijk', trophyAgain:'Nog een keer!',
   r1:'<b>2 tot 6 spelers.</b> Iedereen start met <b>1 kaart</b> (jaartal zichtbaar) en <b>2 tokens</b>. De beurt gaat met de klok mee.',
-  r2:'Op je beurt: speel het nummer, leg de kaart <b>links, rechts of tussen</b> je kaarten — oudste links.',
-  r3:'Klopt de plek? Je houdt de kaart. Fout? Weg — tenzij je tegenstander KweetHetBeter riep en het wél goed had.',
+  r2:'Op je beurt: speel het nummer, leg de kaart <b>links, rechts of tussen</b> je kaarten, oudste links.',
+  r3:'Klopt de plek? Je houdt de kaart. Fout? Weg, tenzij je tegenstander KweetHetBeter riep en het wél goed had.',
   r4:'<b>Token verdienen:</b> ken je titel én artiest, dan krijg je 1 token (ook als je de kaart fout legt). Max 5.',
   r5:'<b>Ken je \'t nummer niet?</b> Betaal 1 token en sla over voor een nieuwe kaart.',
-  r6:'<b>KweetHetBeter roepen:</b> denk je dat de speler fout legt? Zet 1 token op de plek waar jij denkt dat \'t hoort. Goed geraden = kaart gestolen. Meerdere spelers mogen roepen, maar niet twee tokens op dezelfde plek — wie het eerst riep én goed zit, wint.',
-  r7:'<b>3 tokens ruilen:</b> altijd mogelijk, ook als je niet aan de beurt bent — pak de bovenste kaart, gratis goed op je tijdlijn. De beurt loopt gewoon door.',
-  r8:'<b>Telefoons met het scherm naar beneden, graag.</b> Sommige telefoons tonen de naam van het nummer op het vergrendelscherm — dat verklapt het antwoord.',
+  r6:'<b>KweetHetBeter roepen:</b> denk je dat de speler fout legt? Zet 1 token op de plek waar jij denkt dat \'t hoort. Goed geraden = kaart gestolen. Meerdere spelers mogen roepen, maar niet twee tokens op dezelfde plek, wie het eerst riep én goed zit, wint.',
+  r7:'<b>3 tokens ruilen:</b> altijd mogelijk, ook als je niet aan de beurt bent, pak de bovenste kaart, gratis goed op je tijdlijn. De beurt loopt gewoon door.',
+  r8:'<b>Telefoons met het scherm naar beneden, graag.</b> Sommige telefoons tonen de naam van het nummer op het vergrendelscherm, dat verklapt het antwoord.',
   cactus:'KweetNiet!', turtle:'Duurt Lang!'
  },
  en:{
@@ -4376,13 +4376,13 @@ const TR={
   noTokenChal:'{name} has no token to call KnowItBetter.', searching:'⏳ Searching…',
   lastMove:'Last move', tradeText:'Tokens for the win. Easy!', trophyAgain:'Again!',
   r1:'<b>2 to 6 players.</b> Everyone starts with <b>1 card</b> (year visible) and <b>2 tokens</b>. Turns go clockwise.',
-  r2:'On your turn: play the song, place the card <b>left, right or between</b> your cards — oldest on the left.',
-  r3:'Right spot? You keep the card. Wrong? Gone — unless an opponent called KnowItBetter and got it right.',
+  r2:'On your turn: play the song, place the card <b>left, right or between</b> your cards, oldest on the left.',
+  r3:'Right spot? You keep the card. Wrong? Gone, unless an opponent called KnowItBetter and got it right.',
   r4:'<b>Earn a token:</b> name the title and artist and you get 1 token (even if you place the card wrong). Max 5.',
   r5:'<b>Don\'t know the song?</b> Pay 1 token and skip for a new card.',
-  r6:'<b>Call KnowItBetter:</b> think the player is placing it wrong? Put 1 token where you think it belongs. Right = card stolen. Several players may call, but not two tokens on the same spot — whoever called first and is right wins.',
-  r7:'<b>Trade 3 tokens:</b> always allowed, even when it is not your turn — take the top card, placed correctly for free. Play just continues.',
-  r8:'<b>Phones face-down, please.</b> Some phones show the song title on the lock screen — that gives the answer away.',
+  r6:'<b>Call KnowItBetter:</b> think the player is placing it wrong? Put 1 token where you think it belongs. Right = card stolen. Several players may call, but not two tokens on the same spot, whoever called first and is right wins.',
+  r7:'<b>Trade 3 tokens:</b> always allowed, even when it is not your turn, take the top card, placed correctly for free. Play just continues.',
+  r8:'<b>Phones face-down, please.</b> Some phones show the song title on the lock screen, that gives the answer away.',
   cactus:'KnowNot!', turtle:'Taking Long!'
  },
  de:{
@@ -4457,13 +4457,13 @@ const TR={
   noTokenChal:'{name} hat kein Token, um WeißIchBesser zu rufen.', searching:'⏳ Suche…',
   lastMove:'Letzter Zug', tradeText:'Token für den Sieg. Ganz easy!', trophyAgain:'Nochmal!',
   r1:'<b>2 bis 6 Spieler.</b> Alle starten mit <b>1 Karte</b> (Jahr sichtbar) und <b>2 Tokens</b>. Es geht im Uhrzeigersinn.',
-  r2:'Wenn du dran bist: spiel den Song, leg die Karte <b>links, rechts oder dazwischen</b> — ältestes links.',
-  r3:'Stelle richtig? Du behältst die Karte. Falsch? Weg — außer ein Gegner rief WeißIchBesser und lag richtig.',
+  r2:'Wenn du dran bist: spiel den Song, leg die Karte <b>links, rechts oder dazwischen</b>, ältestes links.',
+  r3:'Stelle richtig? Du behältst die Karte. Falsch? Weg, außer ein Gegner rief WeißIchBesser und lag richtig.',
   r4:'<b>Token verdienen:</b> nenne Titel und Interpret, dann bekommst du 1 Token (auch bei falscher Karte). Max 5.',
   r5:'<b>Song unbekannt?</b> Zahl 1 Token und überspringe für eine neue Karte.',
-  r6:'<b>WeißIchBesser rufen:</b> glaubst du, der Spieler legt falsch? Setz 1 Token an die Stelle, wo es deiner Meinung nach hingehört. Richtig = Karte gestohlen. Mehrere dürfen rufen, aber nicht zwei Token auf dieselbe Stelle — wer zuerst rief und richtig liegt, gewinnt.',
-  r7:'<b>3 Tokens tauschen:</b> immer möglich, auch wenn du nicht dran bist — nimm die oberste Karte, gratis richtig platziert. Das Spiel läuft weiter.',
-  r8:'<b>Handys bitte mit dem Display nach unten.</b> Manche Handys zeigen den Songtitel auf dem Sperrbildschirm — das verrät die Antwort.',
+  r6:'<b>WeißIchBesser rufen:</b> glaubst du, der Spieler legt falsch? Setz 1 Token an die Stelle, wo es deiner Meinung nach hingehört. Richtig = Karte gestohlen. Mehrere dürfen rufen, aber nicht zwei Token auf dieselbe Stelle, wer zuerst rief und richtig liegt, gewinnt.',
+  r7:'<b>3 Tokens tauschen:</b> immer möglich, auch wenn du nicht dran bist, nimm die oberste Karte, gratis richtig platziert. Das Spiel läuft weiter.',
+  r8:'<b>Handys bitte mit dem Display nach unten.</b> Manche Handys zeigen den Songtitel auf dem Sperrbildschirm, das verrät die Antwort.',
   cactus:'WeißNicht!', turtle:'Dauert Lang!'
  }
 };

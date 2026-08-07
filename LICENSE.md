@@ -1,7 +1,7 @@
 <!-- Gebruiksvoorwaarden van de app; wordt onderin KweetHet vanuit de app gelinkt. -->
 # LICENTIE / LICENSE
 
-**KweetHet** — een muziekspel waarin spelers het releasejaar van nummers raden.
+**KweetHet**, een muziekspel waarin spelers het releasejaar van nummers raden.
 
 Copyright © 2026 Willem Bakker. Alle rechten voorbehouden.
 Gemaakt door Willem Bakker & Claude (Anthropic).
@@ -24,8 +24,8 @@ toegestaan om:
 
 1. De broncode van dit spel geheel of gedeeltelijk te kopiëren, te hergebruiken
    in een eigen project, te verspreiden of openbaar te maken.
-2. De samengestelde nummerlijst — de selectie, de indeling in speellijsten, de
-   gecorrigeerde jaartallen en de controle op beschikbare fragmenten — geheel of
+2. De samengestelde nummerlijst, de selectie, de indeling in speellijsten, de
+   gecorrigeerde jaartallen en de controle op beschikbare fragmenten, geheel of
    in substantiële delen over te nemen, op te vragen of te hergebruiken.
 3. Dit spel of een afgeleide daarvan commercieel te exploiteren.
 4. De naamsvermelding of deze licentie te verwijderen of te wijzigen.
@@ -83,9 +83,9 @@ Without prior written permission of the rights holder, you may not:
 
 1. Copy, reuse in your own project, distribute or publish the source code of
    this game, in whole or in part.
-2. Extract, reuse or re-publish the curated song collection — the selection,
+2. Extract, reuse or re-publish the curated song collection, the selection,
    the grouping into playlists, the corrected release years and the verified
-   clip availability — in whole or in substantial part.
+   clip availability, in whole or in substantial part.
 3. Exploit this game, or any derivative of it, commercially.
 4. Remove or alter the attribution or this licence.
 
@@ -142,9 +142,9 @@ gestattet:
 
 1. Den Quellcode dieses Spiels ganz oder teilweise zu kopieren, in einem
    eigenen Projekt wiederzuverwenden, zu verbreiten oder zu veröffentlichen.
-2. Die zusammengestellte Songliste — die Auswahl, die Einteilung in
+2. Die zusammengestellte Songliste, die Auswahl, die Einteilung in
    Spiellisten, die korrigierten Jahreszahlen und die Kontrolle der
-   verfügbaren Fragmente — ganz oder in wesentlichen Teilen zu übernehmen,
+   verfügbaren Fragmente, ganz oder in wesentlichen Teilen zu übernehmen,
    abzufragen oder wiederzuverwenden.
 3. Dieses Spiel oder eine Abwandlung davon kommerziell zu nutzen.
 4. Die Urheberangabe oder diese Lizenz zu entfernen oder zu ändern.
