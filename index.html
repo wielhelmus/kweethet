@@ -3692,7 +3692,8 @@ async function playSong(){
     // 1) hervatten na pauze — direct in de klik, dus altijd toegestaan
     if(G.paused && G.clips && G.clips.length){
       try{ await a.play(); G.playing=true; G.paused=false; G.msg=clipMsg(G.clipIdx,G.clips.length); render(); return; }catch(e){}
-      return;
+      // a.play() mislukte (bv. onderbroken doordat playClip() net daarvoor de src wisselde) --
+      // val door naar het normale pad hieronder voor een verse poging, i.p.v. hier te stoppen
     }
     // 2) geluid ontgrendelen binnen de klik
     unlockAudio();
@@ -4245,7 +4246,7 @@ function tagStarts(){G.players.forEach(p=>{if(p.tl[0])p.tl[0].__start=true;});}
 let NPLAYERS=2;
 const NAMES=['Speler 1','Speler 2','Speler 3','Speler 4','Speler 5','Speler 6'];
 /* ===== meertaligheid (NL/EN/DE) ===== */
-const APP_VERSION='KweetHet.07-08-26i';   // versienummer: KweetHet.<dd-mm-jj>
+const APP_VERSION='KweetHet.07-08-26j';   // versienummer: KweetHet.<dd-mm-jj>
 let LANG = (()=>{ try{ const l=localStorage.getItem('kweethet.lang.v1'); return (l==='en'||l==='de'||l==='nl')?l:'nl'; }catch(e){ return 'nl'; } })();
 const TR={
  nl:{
