@@ -339,9 +339,10 @@ h1,h2,h3,.num{font-family:"Bricolage Grotesque",Inter,sans-serif}
   .ov#setup .modal{max-width:820px}
   .setup-cols{display:grid;grid-template-columns:1fr 1fr;gap:0 28px;align-items:start}
   .setup-who,.setup-how{display:block;min-width:0}
-  .colhead{display:flex;align-items:center;gap:7px;margin:2px 0 10px;
-    font:800 11px "Bricolage Grotesque",Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
-  .colhead::before{content:"";width:14px;height:2px;background:var(--gold);display:block}
+  .colhead{display:flex;align-items:center;gap:12px;margin:2px 0 14px;
+    font:800 11px "Bricolage Grotesque",Inter,sans-serif;letter-spacing:.10em;text-transform:uppercase;color:var(--gold)}
+  .colhead::after{content:"";flex:1;height:1px;min-width:0;
+    background:linear-gradient(90deg,currentColor,transparent);opacity:.55}
 }
 .modal{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:26px;max-width:460px;width:100%;max-height:90vh;max-height:90dvh;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .modal h2{margin:0 0 6px;font-size:24px;letter-spacing:-.02em}
@@ -4220,7 +4221,7 @@ function tagStarts(){G.players.forEach(p=>{if(p.tl[0])p.tl[0].__start=true;});}
 let NPLAYERS=2;
 const NAMES=['Speler 1','Speler 2','Speler 3','Speler 4','Speler 5','Speler 6'];
 /* ===== meertaligheid (NL/EN/DE) ===== */
-const APP_VERSION='KweetHet.07-08-26g';   // versienummer: KweetHet.<dd-mm-jj>
+const APP_VERSION='KweetHet.07-08-26h';   // versienummer: KweetHet.<dd-mm-jj>
 let LANG = (()=>{ try{ const l=localStorage.getItem('kweethet.lang.v1'); return (l==='en'||l==='de'||l==='nl')?l:'nl'; }catch(e){ return 'nl'; } })();
 const TR={
  nl:{
